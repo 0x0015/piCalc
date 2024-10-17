@@ -1,6 +1,7 @@
 #include <iostream>
 #include "parser/ptParse/ptParse.hpp"
 #include "mathEngine/expr.hpp"
+#include "mathEngine/simplify.hpp"
 
 int main(int argc, char** argv){
 	std::string input;
@@ -19,8 +20,12 @@ int main(int argc, char** argv){
 		return 1;
 	}
 	if(std::holds_alternative<mathEngine::equation>(parsedResult->value)){
-		std::cout<<"Got input: "<<std::get<mathEngine::equation>(parsedResult->value).toLatex()<<std::endl;
+		auto& eq = std::get<mathEngine::equation>(parsedResult->value);
+		std::cout<<"Got input: "<<eq.toLatex()<<std::endl;
+		std::cout<<"Reduced to: "<<mathEngine::simplify(eq).toLatex()<<std::endl;
 	}else{
-		std::cout<<"Got input: "<<std::get<std::shared_ptr<mathEngine::expr>>(parsedResult->value)->toLatex()<<std::endl;
+		std::shared_ptr<mathEngine::expr> exp = std::get<std::shared_ptr<mathEngine::expr>>(parsedResult->value);
+		std::cout<<"Got input: "<<exp->toLatex()<<std::endl;
+		std::cout<<"Reduced to: "<<mathEngine::simplify(exp)->toLatex()<<std::endl;
 	}
 };

@@ -6,6 +6,8 @@ OBJS	= main.cpp.o\
 	  mathEngine/exprs/exponent.cpp.o \
 	  mathEngine/exprs/multiply.cpp.o \
 	  mathEngine/exprs/variable.cpp.o \
+	  mathEngine/simplify.cpp.o \
+	  mathEngine/simplifications/reduceRationals.cpp.o \
 	  parser/parseUtil.cpp.o \
 	  parser/tokenize/basicTokenize.cpp.o \
 	  parser/tokenize/mediumTokenize.cpp.o \
