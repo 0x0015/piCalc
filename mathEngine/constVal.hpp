@@ -23,6 +23,8 @@ namespace mathEngine{
 		valueType value;
 		double toDouble() const;
 		std::string toLatex() const;
+		constVal clone() const;
+		std::size_t hash() const;
 	};
 	constVal operator+(const constVal& a, const constVal& b);
 	constVal operator*(const constVal& a, const constVal& b);

@@ -1,5 +1,6 @@
 #include "exponent.hpp"
 #include <cmath>
+#include "../hashCombine.hpp"
 
 double mathEngine::exprs::exponent::evalDouble() const{
 	return std::pow(base->evalDouble(), exp->evalDouble());
@@ -18,3 +19,17 @@ void mathEngine::exprs::exponent::propegateDFS(const std::function<void(std::sha
 std::string mathEngine::exprs::exponent::toLatex() const{
 	return "{" + base->toLatex() + "}^{" + exp->toLatex() + "}";
 }
+
+std::shared_ptr<mathEngine::expr> mathEngine::exprs::exponent::clone() const{
+	auto output = std::make_shared<exponent>();
+	output->base = base->clone();
+	output->exp = exp->clone();
+	return output;
+}
+
+std::size_t mathEngine::exprs::exponent::hash() const{
+	std::size_t lhsHash = base->hash();
+	mathEngine::hash_combine(lhsHash, exp->hash(), COMPILE_TIME_CRC32_STR("exponent"));
+	return lhsHash;
+}
+

@@ -1,4 +1,5 @@
 #include "multiply.hpp"
+#include "../hashCombine.hpp"
 
 double mathEngine::exprs::multiply::evalDouble() const{
 	return lhs->evalDouble() * rhs->evalDouble();
@@ -15,6 +16,19 @@ void mathEngine::exprs::multiply::propegateDFS(const std::function<void(std::sha
 }
 
 std::string mathEngine::exprs::multiply::toLatex() const{
-	return "(" + lhs->toLatex() + "+" + rhs->toLatex() + ")";
+	return "(" + lhs->toLatex() + "*" + rhs->toLatex() + ")";
+}
+
+std::shared_ptr<mathEngine::expr> mathEngine::exprs::multiply::clone() const{
+	auto output = std::make_shared<multiply>();
+	output->lhs = lhs->clone();
+	output->rhs = rhs->clone();
+	return output;
+}
+
+std::size_t mathEngine::exprs::multiply::hash() const{
+	std::size_t lhsHash = lhs->hash();
+	mathEngine::hash_combine(lhsHash, rhs->hash(), COMPILE_TIME_CRC32_STR("multiply"));
+	return lhsHash;
 }
 

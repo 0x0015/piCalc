@@ -96,6 +96,21 @@ parser::parseRes<rational> parseInt(std::span<const parser::mediumToken> tokens)
 	return parser::makeParseRes(rational{val * isNegative, 1}, outputSize);
 }
 
+parser::parseRes<mathEngine::constantName> parseUniversalConstant(std::span<const parser::mediumToken> tokens){
+	if(tokens.empty())
+		return std::nullopt;
+	if(!std::holds_alternative<parser::basicToken>(tokens.front().value))
+		return std::nullopt;
+
+	const auto& name = std::get<parser::basicToken>(tokens.front().value).val;
+	if(name == "pi")
+		return parser::makeParseRes(mathEngine::PI, 1);
+	if(name == "e")
+		return parser::makeParseRes(mathEngine::E, 1);
+
+	return std::nullopt;
+}
+
 parser::parseRes<std::shared_ptr<mathEngine::exprs::constant>> parser::parseConst(std::span<const parser::mediumToken> tokens){
 	const auto& frac = parseFraction(tokens);
 	if(frac){
@@ -119,6 +134,13 @@ parser::parseRes<std::shared_ptr<mathEngine::exprs::constant>> parser::parseCons
 		auto output = std::make_shared<mathEngine::exprs::constant>();
 		output->value.value = in->val;
 		return makeParseRes(output, in->toksConsumed);
+	}
+
+	const auto& mathConst = parseUniversalConstant(tokens);
+	if(mathConst){
+		auto output = std::make_shared<mathEngine::exprs::constant>();
+		output->value.value = mathConst->val;
+		return makeParseRes(output, mathConst->toksConsumed);
 	}
 
 	return std::nullopt;

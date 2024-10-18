@@ -1,4 +1,5 @@
 #include "add.hpp"
+#include "../hashCombine.hpp"
 
 double mathEngine::exprs::add::evalDouble() const{
 	return lhs->evalDouble() + rhs->evalDouble();
@@ -16,5 +17,18 @@ void mathEngine::exprs::add::propegateDFS(const std::function<void(std::shared_p
 
 std::string mathEngine::exprs::add::toLatex() const{
 	return "(" + lhs->toLatex() + "+" + rhs->toLatex() + ")";
+}
+
+std::shared_ptr<mathEngine::expr> mathEngine::exprs::add::clone() const{
+	auto output = std::make_shared<add>();
+	output->lhs = lhs->clone();
+	output->rhs = rhs->clone();
+	return output;
+}
+
+std::size_t mathEngine::exprs::add::hash() const{
+	std::size_t lhsHash = lhs->hash();
+	mathEngine::hash_combine(lhsHash, rhs->hash(), COMPILE_TIME_CRC32_STR("add"));
+	return lhsHash;
 }
 

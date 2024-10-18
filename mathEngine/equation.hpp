@@ -13,5 +13,7 @@ namespace mathEngine{
 		constVal evalDiff() const;
 		void propegateDFS(const std::function<void(std::shared_ptr<expr>)>& func, bool includeConstants);
 		std::string toLatex() const;
+		equation clone() const;
+		std::size_t hash() const;
 	};
 }

@@ -21,3 +21,7 @@ void mathEngine::equation::propegateDFS(const std::function<void(std::shared_ptr
 std::string mathEngine::equation::toLatex() const{
 	return lhs->toLatex() + " = " + rhs->toLatex();
 }
+
+mathEngine::equation mathEngine::equation::clone() const{
+	return equation{lhs->clone(), rhs->clone()};
+}

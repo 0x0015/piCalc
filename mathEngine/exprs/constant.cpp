@@ -2,6 +2,7 @@
 #include <cmath>
 #include "add.hpp"
 #include "multiply.hpp"
+#include "../hashCombine.hpp"
 
 double mathEngine::exprs::constant::evalDouble() const{
 	return value.toDouble();
@@ -23,3 +24,16 @@ void mathEngine::exprs::constant::propegateDFS(const std::function<void(std::sha
 std::string mathEngine::exprs::constant::toLatex() const{
 	return value.toLatex();
 }
+
+std::shared_ptr<mathEngine::expr> mathEngine::exprs::constant::clone() const{
+	auto output = std::make_shared<constant>();
+	output->value = value.clone();
+	return output;
+}
+
+std::size_t mathEngine::exprs::constant::hash() const{
+	std::size_t outputHash = value.hash();
+	mathEngine::hash_combine(outputHash, COMPILE_TIME_CRC32_STR("constant"));
+	return outputHash;
+}
+

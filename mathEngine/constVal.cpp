@@ -4,6 +4,7 @@
 #include "exprs/multiply.hpp"
 #include "exprs/exponent.hpp"
 #include "exprs/constant.hpp"
+#include "hashCombine.hpp"
 
 double mathEngine::constVal::toDouble() const{
 	if(std::holds_alternative<double>(value)){
@@ -120,6 +121,30 @@ std::string mathEngine::constVal::toLatex() const{
 		return std::string(constantLatexNames[std::get<constantName>(value)]);
 	}else{
 		return "\\text{unknown constant}";
+	}
+}
+
+mathEngine::constVal mathEngine::constVal::clone() const{
+	if(!std::holds_alternative<std::shared_ptr<const expr>>(value)){
+		return constVal{std::get<std::shared_ptr<const expr>>(value)->clone()};
+	}
+	return constVal{value};
+}
+
+std::size_t mathEngine::constVal::hash() const{
+	if(std::holds_alternative<double>(value)){
+		return std::hash<double>{}(std::get<double>(value));
+	}else if(std::holds_alternative<rational>(value)){
+		const auto& rat = std::get<rational>(value);
+		std::size_t output = std::hash<int>{}(rat.num);
+		mathEngine::hash_combine(output, rat.denom);
+		return output;
+	}else if(std::holds_alternative<std::shared_ptr<const expr>>(value)){
+		return std::get<std::shared_ptr<const expr>>(value)->hash();
+	}else if(std::holds_alternative<constantName>(value)){
+		return std::hash<int>{}(std::get<constantName>(value));
+	}else{
+		return -1;
 	}
 }
 
