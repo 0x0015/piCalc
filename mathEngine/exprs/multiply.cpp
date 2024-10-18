@@ -2,32 +2,37 @@
 #include "../hashCombine.hpp"
 
 double mathEngine::exprs::multiply::evalDouble() const{
-	return lhs->evalDouble() * rhs->evalDouble();
+	if(terms.empty())
+		return -1;
+	double output = terms.front()->evalDouble();
+	for(unsigned int i=1;i<terms.size();i++)
+		output *= terms[i]->evalDouble();
+	return output;
 }
 
 mathEngine::constVal mathEngine::exprs::multiply::eval() const{
-	return lhs->eval() * rhs->eval();
+	if(terms.empty())
+		return {};
+	constVal output = terms.front()->eval();
+	for(unsigned int i=1;i<terms.size();i++)
+		output = output * terms[i]->eval();
+	return output;
 }
 
 void mathEngine::exprs::multiply::propegateDFS(const std::function<void(std::shared_ptr<expr>)>& func, bool includeConstants){
 	func(shared_from_this());
-	lhs->propegateDFS(func, includeConstants);
-	rhs->propegateDFS(func, includeConstants);
+	for(const auto& term : terms)
+		term->propegateDFS(func, includeConstants);
 }
 
 void mathEngine::exprs::multiply::propegateDFS_replace_internal(const expr::DFS_replacement_functype& func, bool includeConstants){
-	auto lhs_res = func(lhs);
-	auto rhs_res = func(rhs);
-
-	if(lhs_res)
-		lhs = *lhs_res;
-	else
-		lhs->propegateDFS_replace_internal(func, includeConstants);
-
-	if(rhs_res)
-		rhs = *rhs_res;
-	else
-		rhs->propegateDFS_replace_internal(func, includeConstants);
+	for(unsigned int i=0;i<terms.size();i++){
+		auto res = func(terms[i]);
+		if(res)
+			terms[i] = *res;
+		else
+			terms[i]->propegateDFS_replace_internal(func, includeConstants);
+	}
 }
 
 std::shared_ptr<mathEngine::expr> mathEngine::exprs::multiply::propegateDFS_replace(const expr::DFS_replacement_functype& func, bool includeConstants){
@@ -39,19 +44,27 @@ std::shared_ptr<mathEngine::expr> mathEngine::exprs::multiply::propegateDFS_repl
 }
 
 std::string mathEngine::exprs::multiply::toLatex() const{
-	return "(" + lhs->toLatex() + "*" + rhs->toLatex() + ")";
+	std::string output = "(";
+	for(unsigned int i=0;i<terms.size();i++){
+		output += terms[i]->toLatex();
+		if(i+1 < terms.size())
+			output += '*';
+	}
+	output += ')';
+	return output;
 }
 
 std::shared_ptr<mathEngine::expr> mathEngine::exprs::multiply::clone() const{
 	auto output = std::make_shared<multiply>();
-	output->lhs = lhs->clone();
-	output->rhs = rhs->clone();
+	for(const auto& term : terms)
+		output->terms.push_back(term->clone());
 	return output;
 }
 
 std::size_t mathEngine::exprs::multiply::hash() const{
-	std::size_t lhsHash = lhs->hash();
-	mathEngine::hash_combine(lhsHash, rhs->hash(), COMPILE_TIME_CRC32_STR("multiply"));
-	return lhsHash;
+	std::size_t outputHash = COMPILE_TIME_CRC32_STR("add");
+	for(const auto& term : terms)
+		mathEngine::hash_combine(outputHash, term->hash());
+	return outputHash;
 }
 

@@ -1,13 +1,17 @@
 #include "simplify.hpp"
 #include "simplifications/reduceRationals.hpp"
+#include "simplifications/mergeCommutativeOperators.hpp"
 #include "simplifications/reduceBasicArithmatic.hpp"
+#include "simplifications/reduceSingleTermOps.hpp"
 #include "../mathEngine/expr.hpp"
 
 std::shared_ptr<mathEngine::expr> mathEngine::simplify(std::shared_ptr<expr> exp){
 	auto phase1 = simplification::reduceRationals(exp);
-	auto phase2 = simplification::reduceBasicArithmatic(phase1);
+	auto phase2 = simplification::mergeCommutativeOperators(phase1);
+	auto phase3 = simplification::reduceBasicArithmatic(phase2);
+	auto phase4 = simplification::reduceSingleTermOps(phase3);
 
-	return phase2;
+	return phase4;
 }
 
 std::shared_ptr<mathEngine::expr> mathEngine::fullySimplify(std::shared_ptr<expr> exp){

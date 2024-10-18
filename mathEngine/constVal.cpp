@@ -32,8 +32,7 @@ mathEngine::constVal mathEngine::operator+(const mathEngine::constVal& a, const 
 		auto rhs = std::make_shared<mathEngine::exprs::constant>();
 		lhs->value = a;
 		rhs->value = b;
-		add->lhs = lhs;
-		add->rhs = rhs;
+		add->terms = {lhs, rhs};
 		output.value = add;
 	}
 	return output;
@@ -54,10 +53,8 @@ mathEngine::constVal mathEngine::operator-(const mathEngine::constVal& a, const 
 		lhs->value = a;
 		rhs->value = b;
 		minusOneConst->value.value = rational(-1, 1);
-		smul->lhs = minusOneConst;
-		smul->rhs = rhs;
-		add->lhs = lhs;
-		add->rhs = smul;
+		smul->terms = {minusOneConst, rhs};
+		add->terms = {lhs, smul};
 		output.value = add;
 	}
 	return output;
@@ -75,8 +72,7 @@ mathEngine::constVal mathEngine::operator*(const mathEngine::constVal& a, const 
 		auto rhs = std::make_shared<mathEngine::exprs::constant>();
 		lhs->value = a;
 		rhs->value = b;
-		mul->lhs = lhs;
-		mul->rhs = rhs;
+		mul->terms = {lhs, rhs};
 		output.value = mul;
 	}
 	return output;
@@ -99,8 +95,7 @@ mathEngine::constVal mathEngine::operator/(const mathEngine::constVal& a, const 
 		minusOneConst->value.value = rational(-1, 1);
 		sexp->exp = minusOneConst;
 		sexp->base = rhs;
-		mul->lhs = lhs;
-		mul->rhs = sexp;
+		mul->terms = {lhs, sexp};
 		output.value = mul;
 	}
 	return output;

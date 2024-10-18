@@ -21,10 +21,7 @@ parser::parseRes<std::shared_ptr<mathEngine::expr>> parseParens(std::span<const 
 
 parser::parseRes<std::shared_ptr<mathEngine::expr>> parser::parseExpression(std::span<const parser::mediumToken> tokens, expressionTypeToSkip skip){
 	using rt = std::shared_ptr<mathEngine::expr>;
-	const auto& parens = parseParens(tokens);
 	expressionTypeToSkip sk = (expressionTypeToSkip)~skip;
-	if(parens)
-		return makeParseRes(parens->val, parens->toksConsumed);
 	if(sk & expressionTypeToSkip::Add){
 		const auto& add = parseAdd(tokens, skip);
 		if(add)
@@ -35,6 +32,9 @@ parser::parseRes<std::shared_ptr<mathEngine::expr>> parser::parseExpression(std:
 		if(mul)
 			return makeParseRes<rt>(mul->val, mul->toksConsumed);
 	}
+	const auto& parens = parseParens(tokens);
+	if(parens)
+		return makeParseRes(parens->val, parens->toksConsumed);
 
 	const auto& constant = parseConst(tokens);
 	if(constant)

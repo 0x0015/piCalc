@@ -8,7 +8,9 @@ OBJS	= main.cpp.o\
 	  mathEngine/exprs/variable.cpp.o \
 	  mathEngine/simplify.cpp.o \
 	  mathEngine/simplifications/reduceRationals.cpp.o \
+	  mathEngine/simplifications/mergeCommutativeOperators.cpp.o \
 	  mathEngine/simplifications/reduceBasicArithmatic.cpp.o \
+	  mathEngine/simplifications/reduceSingleTermOps.cpp.o \
 	  parser/parseUtil.cpp.o \
 	  parser/tokenize/basicTokenize.cpp.o \
 	  parser/tokenize/mediumTokenize.cpp.o \

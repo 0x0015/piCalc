@@ -26,8 +26,7 @@ parser::parseRes<std::shared_ptr<mathEngine::exprs::multiply>> parser::parseMul(
 	tokens = tokens.subspan(rhs->toksConsumed);
 
 	auto output = std::make_shared<mathEngine::exprs::multiply>();
-	output->lhs = lhs->val;
-	output->rhs = rhs->val;
+	output->terms = {lhs->val, rhs->val};
 
 	return makeParseRes(output, usedTokens);
 }
