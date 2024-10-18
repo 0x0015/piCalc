@@ -21,6 +21,25 @@ void mathEngine::exprs::constant::propegateDFS(const std::function<void(std::sha
 	}
 }
 
+void mathEngine::exprs::constant::propegateDFS_replace_internal(const expr::DFS_replacement_functype& func, bool includeConstants){
+	if(includeConstants && std::holds_alternative<std::shared_ptr<const expr>>(value.value)){
+		auto& constShared = std::get<std::shared_ptr<const expr>>(value.value);
+		auto shared = std::const_pointer_cast<expr>(constShared); //illegal jank, but permissable for now
+		auto res = func(shared);
+		if(res)
+			constShared = *res;
+		else
+			shared->propegateDFS_replace_internal(func, includeConstants);
+	}
+}
+std::shared_ptr<mathEngine::expr> mathEngine::exprs::constant::propegateDFS_replace(const expr::DFS_replacement_functype& func, bool includeConstants){
+	auto res = func(shared_from_this());
+	if(res)
+		return *res;
+	propegateDFS_replace_internal(func, includeConstants);
+	return shared_from_this();
+}
+
 std::string mathEngine::exprs::constant::toLatex() const{
 	return value.toLatex();
 }

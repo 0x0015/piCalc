@@ -16,6 +16,29 @@ void mathEngine::exprs::exponent::propegateDFS(const std::function<void(std::sha
 	exp->propegateDFS(func, includeConstants);
 }
 
+void mathEngine::exprs::exponent::propegateDFS_replace_internal(const expr::DFS_replacement_functype& func, bool includeConstants){
+	auto base_res = func(base);
+	auto exp_res = func(exp);
+
+	if(base_res)
+		base = *base_res;
+	else
+		base->propegateDFS_replace_internal(func, includeConstants);
+
+	if(base_res)
+		base = *base_res;
+	else
+		base->propegateDFS_replace_internal(func, includeConstants);
+}
+
+std::shared_ptr<mathEngine::expr> mathEngine::exprs::exponent::propegateDFS_replace(const expr::DFS_replacement_functype& func, bool includeConstants){
+	auto res = func(shared_from_this());
+	if(res)
+		return *res;
+	propegateDFS_replace_internal(func, includeConstants);
+	return shared_from_this();
+}
+
 std::string mathEngine::exprs::exponent::toLatex() const{
 	return "{" + base->toLatex() + "}^{" + exp->toLatex() + "}";
 }

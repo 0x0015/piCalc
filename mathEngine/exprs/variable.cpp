@@ -13,6 +13,17 @@ void mathEngine::exprs::variable::propegateDFS(const std::function<void(std::sha
 	func(shared_from_this());
 }
 
+void mathEngine::exprs::variable::propegateDFS_replace_internal(const expr::DFS_replacement_functype& func, bool includeConstants){
+	//non
+}
+std::shared_ptr<mathEngine::expr> mathEngine::exprs::variable::propegateDFS_replace(const expr::DFS_replacement_functype& func, bool includeConstants){
+	auto res = func(shared_from_this());
+	if(res)
+		return *res;
+	propegateDFS_replace_internal(func, includeConstants);
+	return shared_from_this();
+}
+
 std::string mathEngine::exprs::variable::toLatex() const{
 	return name;
 }

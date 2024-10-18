@@ -22,10 +22,10 @@ int main(int argc, char** argv){
 	if(std::holds_alternative<mathEngine::equation>(parsedResult->value)){
 		auto& eq = std::get<mathEngine::equation>(parsedResult->value);
 		std::cout<<"Got input: "<<eq.toLatex()<<std::endl;
-		std::cout<<"Reduced to: "<<mathEngine::simplify(eq).toLatex()<<std::endl;
+		std::cout<<"Reduced to: "<<mathEngine::fullySimplify(eq).toLatex()<<std::endl;
 	}else{
 		std::shared_ptr<mathEngine::expr> exp = std::get<std::shared_ptr<mathEngine::expr>>(parsedResult->value);
 		std::cout<<"Got input: "<<exp->toLatex()<<std::endl;
-		std::cout<<"Reduced to: "<<mathEngine::simplify(exp)->toLatex()<<std::endl;
+		std::cout<<"Reduced to: "<<mathEngine::fullySimplify(exp)->toLatex()<<std::endl;
 	}
 };

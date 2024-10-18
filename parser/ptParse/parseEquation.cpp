@@ -25,5 +25,8 @@ parser::parseRes<mathEngine::equation> parser::parseEquation(std::span<const par
 	usedTokens += rhs->toksConsumed;
 	tokens = tokens.subspan(rhs->toksConsumed);
 
-	return makeParseRes(mathEngine::equation{lhs->val, rhs->val}, usedTokens);
+	mathEngine::equation eq;
+	eq.lhs = lhs->val;
+	eq.rhs = rhs->val;
+	return makeParseRes(eq, usedTokens);
 }

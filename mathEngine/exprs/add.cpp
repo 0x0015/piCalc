@@ -15,6 +15,29 @@ void mathEngine::exprs::add::propegateDFS(const std::function<void(std::shared_p
 	rhs->propegateDFS(func, includeConstants);
 }
 
+void mathEngine::exprs::add::propegateDFS_replace_internal(const expr::DFS_replacement_functype& func, bool includeConstants){
+	auto lhs_res = func(lhs);
+	auto rhs_res = func(rhs);
+
+	if(lhs_res)
+		lhs = *lhs_res;
+	else
+		lhs->propegateDFS_replace_internal(func, includeConstants);
+
+	if(rhs_res)
+		rhs = *rhs_res;
+	else
+		rhs->propegateDFS_replace_internal(func, includeConstants);
+}
+
+std::shared_ptr<mathEngine::expr> mathEngine::exprs::add::propegateDFS_replace(const expr::DFS_replacement_functype& func, bool includeConstants){
+	auto val = func(shared_from_this());
+	if(val)
+		return *val;
+	propegateDFS_replace_internal(func, includeConstants);
+	return shared_from_this();
+}
+
 std::string mathEngine::exprs::add::toLatex() const{
 	return "(" + lhs->toLatex() + "+" + rhs->toLatex() + ")";
 }
