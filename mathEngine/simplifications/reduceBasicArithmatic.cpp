@@ -31,7 +31,7 @@ std::shared_ptr<mathEngine::expr> mathEngine::simplification::reduceBasicArithma
 					otherTerms.push_back(term);
 			}
 			add->terms = otherTerms;
-			if(rationalSum){
+			if(rationalSum && *rationalSum != rational{0, 1}){
 				auto rationalTerm = std::make_shared<exprs::constant>();
 				rationalTerm->value.value = *rationalSum;
 				add->terms.push_back(rationalTerm);
@@ -70,7 +70,7 @@ std::shared_ptr<mathEngine::expr> mathEngine::simplification::reduceBasicArithma
 					otherTerms.push_back(term);
 			}
 			mul->terms = otherTerms;
-			if(rationalProduct){
+			if(rationalProduct && *rationalProduct != rational{1,1}){
 				auto rationalTerm = std::make_shared<exprs::constant>();
 				rationalTerm->value.value = *rationalProduct;
 				mul->terms.push_back(rationalTerm);
@@ -82,6 +82,26 @@ std::shared_ptr<mathEngine::expr> mathEngine::simplification::reduceBasicArithma
 			}
 		}
 	}, true);
-	return exp;
+
+	auto retVal = exp->propegateDFS_replace([](std::shared_ptr<expr> exp)->std::optional<std::shared_ptr<expr>>{	
+		if(dynamic_cast<exprs::multiply*>(exp.get()) != nullptr){	
+			auto mul = std::dynamic_pointer_cast<exprs::multiply>(exp);
+			for(const auto& term : mul->terms){
+				if(dynamic_cast<exprs::constant*>(term.get()) != nullptr){	
+					auto term_const = std::dynamic_pointer_cast<exprs::constant>(term);
+					if(std::holds_alternative<rational>(term_const->value.value)){
+						const auto& term_rat = std::get<rational>(term_const->value.value);
+						if(term_rat == rational{0, 1}){
+							auto zeroConst = std::make_shared<exprs::constant>();
+							zeroConst->value.value = rational{0, 1};
+							return zeroConst;
+						}
+					}
+				}
+			}
+		}
+		return std::nullopt;
+	}, true);
+	return retVal;
 }
 

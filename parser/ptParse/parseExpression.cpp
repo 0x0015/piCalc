@@ -2,10 +2,11 @@
 #include "parseAdd.hpp"
 #include "parseMul.hpp"
 #include "parseConst.hpp"
+#include "parseDerivative.hpp"
 #include "../../mathEngine/exprs/variable.hpp"
 
 //don't know where else to put this
-parser::parseRes<std::shared_ptr<mathEngine::expr>> parseParens(std::span<const parser::mediumToken> tokens){
+parser::parseRes<std::shared_ptr<mathEngine::expr>> parser::parseParens(std::span<const parser::mediumToken> tokens){
 	if(tokens.empty())
 		return std::nullopt;
 
@@ -22,6 +23,9 @@ parser::parseRes<std::shared_ptr<mathEngine::expr>> parseParens(std::span<const 
 parser::parseRes<std::shared_ptr<mathEngine::expr>> parser::parseExpression(std::span<const parser::mediumToken> tokens, expressionTypeToSkip skip){
 	using rt = std::shared_ptr<mathEngine::expr>;
 	expressionTypeToSkip sk = (expressionTypeToSkip)~skip;
+	const auto& derivative = parseDerivative(tokens);
+	if(derivative)
+		return makeParseRes<rt>(derivative->val, derivative->toksConsumed);
 	if(sk & expressionTypeToSkip::Add){
 		const auto& add = parseAdd(tokens, skip);
 		if(add)

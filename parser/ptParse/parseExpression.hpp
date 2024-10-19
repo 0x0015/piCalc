@@ -10,5 +10,6 @@ namespace parser{
 		Add = 0b1,
 		Mul = 0b10
 	};
+	parseRes<std::shared_ptr<mathEngine::expr>> parseParens(std::span<const parser::mediumToken> tokens);
 	parseRes<std::shared_ptr<mathEngine::expr>> parseExpression(std::span<const mediumToken> tokens, expressionTypeToSkip skip = None);
 }

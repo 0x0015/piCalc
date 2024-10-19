@@ -3,6 +3,7 @@
 #include "simplifications/mergeCommutativeOperators.hpp"
 #include "simplifications/reduceBasicArithmatic.hpp"
 #include "simplifications/reduceSingleTermOps.hpp"
+#include "simplifications/evaluateDerivatives.hpp"
 #include "../mathEngine/expr.hpp"
 
 std::shared_ptr<mathEngine::expr> mathEngine::simplify(std::shared_ptr<expr> exp){
@@ -10,8 +11,9 @@ std::shared_ptr<mathEngine::expr> mathEngine::simplify(std::shared_ptr<expr> exp
 	auto phase2 = simplification::mergeCommutativeOperators(phase1);
 	auto phase3 = simplification::reduceBasicArithmatic(phase2);
 	auto phase4 = simplification::reduceSingleTermOps(phase3);
+	auto phase5 = simplification::evaluateDerivatives(phase4);
 
-	return phase4;
+	return phase5;
 }
 
 std::shared_ptr<mathEngine::expr> mathEngine::fullySimplify(std::shared_ptr<expr> exp){

@@ -48,7 +48,7 @@ std::string mathEngine::exprs::multiply::toLatex() const{
 	for(unsigned int i=0;i<terms.size();i++){
 		output += terms[i]->toLatex();
 		if(i+1 < terms.size())
-			output += '*';
+			output += " \\cdot ";
 	}
 	output += ')';
 	return output;
