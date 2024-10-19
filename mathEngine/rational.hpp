@@ -2,13 +2,20 @@
 #pragma once
 #include <iostream>
 #include <numeric>
-//#include "../../util.hpp"
+#include <cmath>
 
 class rational{
 public:
 	int num;
 	int denom;
-	constexpr rational(int p = 1, int q = 1) : num(p), denom(q) {}
+	constexpr rational(int p = 1, int q = 1) : num(p), denom(q) {
+		reduce();
+	}
+	constexpr void reduce(){
+		int devisor = std::gcd(num, denom);
+		num /= devisor;
+		denom /= devisor;
+	}
 	constexpr double toDouble() const{
 		return (double)num/(double)denom;
 	}
@@ -29,6 +36,7 @@ constexpr rational operator+(const rational r1, rational r2){
 	    temp.num = ((r1.num) * (r2.denom)) + ((r2.num) * (r1.denom));
 	    temp.denom = (r1.denom) * (r2.denom);
 	}
+	temp.reduce();
 	return temp;
 }
 
@@ -36,9 +44,7 @@ constexpr rational operator*(rational r1, rational r2){
 	rational temp;
 	temp.num = r1.num * r2.num;
 	temp.denom = r1.denom * r2.denom;
-	int reducer = std::gcd(temp.num, temp.denom);
-	temp.num /= reducer;
-	temp.denom /= reducer;
+	temp.reduce();
 	return temp;
 }
 
@@ -60,10 +66,3 @@ inline std::ostream & operator<<(std::ostream &out, rational r3)
     return out;
 }
 
-/*
-template<> struct std::hash<rational>{
-	size_t operator()(rational const& tt) const{
-		return std::hash<std::pair<int, int>>{}(std::make_pair(tt.num, tt.denom));
-	}
-};
-*/

@@ -44,13 +44,12 @@ std::shared_ptr<mathEngine::expr> mathEngine::exprs::multiply::propegateDFS_repl
 }
 
 std::string mathEngine::exprs::multiply::toLatex() const{
-	std::string output = "(";
+	std::string output;;
 	for(unsigned int i=0;i<terms.size();i++){
 		output += terms[i]->toLatex();
 		if(i+1 < terms.size())
 			output += " \\cdot ";
 	}
-	output += ')';
 	return output;
 }
 
