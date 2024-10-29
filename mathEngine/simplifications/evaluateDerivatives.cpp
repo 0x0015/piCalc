@@ -4,6 +4,7 @@
 #include "../exprs/exponent.hpp"
 #include "../exprs/multiply.hpp"
 #include "../exprs/variable.hpp"
+#include "../exprs/derivative.hpp"
 
 std::optional<std::shared_ptr<mathEngine::expr>> getDerivativeOf(std::shared_ptr<mathEngine::exprs::add> add, std::string_view wrtVar){
 	auto output = std::make_shared<mathEngine::exprs::add>();

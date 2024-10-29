@@ -135,7 +135,9 @@ std::size_t mathEngine::constVal::hash() const{
 		mathEngine::hash_combine(output, rat.denom);
 		return output;
 	}else if(std::holds_alternative<std::shared_ptr<const expr>>(value)){
-		return std::get<std::shared_ptr<const expr>>(value)->hash();
+		std::size_t hash =  std::get<std::shared_ptr<const expr>>(value)->hash();
+		hash_combine(hash, COMPILE_TIME_CRC32_STR("constVal expr sub"));
+		return hash;
 	}else if(std::holds_alternative<constantName>(value)){
 		return std::hash<int>{}(std::get<constantName>(value));
 	}else{

@@ -48,3 +48,6 @@ std::size_t mathEngine::exprs::sine::hash() const{
 	return insHash;
 }
 
+std::string mathEngine::exprs::sine::getTypeString() const{
+	return "sin(" + inside->getTypeString() + ")";
+}

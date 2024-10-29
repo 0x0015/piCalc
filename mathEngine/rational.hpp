@@ -3,6 +3,7 @@
 #include <iostream>
 #include <numeric>
 #include <cmath>
+#include "hashCombine.hpp"
 
 class rational{
 public:
@@ -65,4 +66,14 @@ inline std::ostream & operator<<(std::ostream &out, rational r3)
     out<<r3.num<<"/"<<r3.denom;
     return out;
 }
+
+template <> struct std::hash<rational>
+{
+	std::size_t operator()(const rational& k) const
+	{
+		std::size_t hash = std::hash<int>{}(k.num);
+		mathEngine::hash_combine(hash, k.denom);
+		return hash;
+	}
+};
 

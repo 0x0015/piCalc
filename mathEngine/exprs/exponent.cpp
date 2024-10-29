@@ -56,3 +56,7 @@ std::size_t mathEngine::exprs::exponent::hash() const{
 	return lhsHash;
 }
 
+std::string mathEngine::exprs::exponent::getTypeString() const{
+	return "(" + base->getTypeString() + ")^(" + exp->getTypeString() + ")";
+}
+

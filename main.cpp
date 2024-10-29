@@ -33,8 +33,9 @@ int main(int argc, char** argv){
 		std::cout<<"Reduced to: "<<mathEngine::fullySimplify(eq).toLatex()<<std::endl;
 	}else{
 		std::shared_ptr<mathEngine::expr> exp = std::get<std::shared_ptr<mathEngine::expr>>(parsedResult->value);
-		std::cout<<"Got input expression: "<<exp->toLatex()<<std::endl;
-		std::cout<<"Reduced to: "<<mathEngine::fullySimplify(exp)->toLatex()<<std::endl;
+		std::cout<<"Got input expression: "<<exp->toLatex()<<" (type string: "<<exp->getTypeString()<<")"<<std::endl;
+		auto simplified = mathEngine::fullySimplify(exp);
+		std::cout<<"Reduced to: "<<simplified->toLatex()<<" (type string: "<<simplified->getTypeString()<<")"<<std::endl;
 		if(doEval){
 			std::string evalAtArg = argv[argc-1];
 			if(evalAtArg.size() >= 3 && evalAtArg[1] == '='){

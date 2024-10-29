@@ -48,3 +48,6 @@ std::size_t mathEngine::exprs::cosine::hash() const{
 	return insHash;
 }
 
+std::string mathEngine::exprs::cosine::getTypeString() const{
+	return "cos(" + inside->getTypeString() + ")";
+}

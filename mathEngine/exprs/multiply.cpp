@@ -67,3 +67,13 @@ std::size_t mathEngine::exprs::multiply::hash() const{
 	return outputHash;
 }
 
+std::string mathEngine::exprs::multiply::getTypeString() const{
+	std::string output = "(";
+	for(unsigned int i=0;i<terms.size();i++){
+		output += terms[i]->getTypeString();
+		if(i+1 < terms.size())
+			output += '*';
+	}
+	output += ')';
+	return output;
+}

@@ -56,3 +56,9 @@ std::size_t mathEngine::exprs::constant::hash() const{
 	return outputHash;
 }
 
+std::string mathEngine::exprs::constant::getTypeString() const{
+	if(std::holds_alternative<std::shared_ptr<const expr>>(value.value)){
+		return "(constant) " + std::get<std::shared_ptr<const expr>>(value.value)->getTypeString();
+	}
+	return "constant";
+}

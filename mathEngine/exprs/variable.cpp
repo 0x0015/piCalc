@@ -39,3 +39,7 @@ std::size_t mathEngine::exprs::variable::hash() const{
 	mathEngine::hash_combine(nameHash, COMPILE_TIME_CRC32_STR("variable"));
 	return nameHash;
 }
+
+std::string mathEngine::exprs::variable::getTypeString() const{
+	return "variable";
+}

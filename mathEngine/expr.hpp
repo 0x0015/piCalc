@@ -20,5 +20,6 @@ namespace mathEngine{
 		virtual std::string toLatex() const = 0;
 		virtual std::shared_ptr<expr> clone() const = 0;
 		virtual std::size_t hash() const = 0;
+		virtual std::string getTypeString() const = 0;
 	};
 }

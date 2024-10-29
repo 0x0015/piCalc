@@ -5,6 +5,7 @@
 #include "simplifications/reduceSingleTermOps.hpp"
 #include "simplifications/evaluateDerivatives.hpp"
 #include "simplifications/reduceTrig.hpp"
+#include "simplifications/constifyOperators.hpp"
 #include "../mathEngine/expr.hpp"
 
 template<auto fn> std::shared_ptr<mathEngine::expr> applyUntilStabilization(std::shared_ptr<mathEngine::expr> exp){
@@ -19,15 +20,27 @@ template<auto fn> std::shared_ptr<mathEngine::expr> applyUntilStabilization(std:
 	}
 }
 
-std::shared_ptr<mathEngine::expr> mathEngine::simplify(std::shared_ptr<expr> exp){
-	auto phase1 = applyUntilStabilization<simplification::reduceRationals>(exp);
-	auto phase2 = applyUntilStabilization<simplification::mergeCommutativeOperators>(phase1);
-	auto phase3 = applyUntilStabilization<simplification::reduceBasicArithmatic>(phase2);
-	auto phase4 = applyUntilStabilization<simplification::reduceSingleTermOps>(phase3);
-	auto phase5 = applyUntilStabilization<simplification::reduceTrig>(phase4);
-	auto phase6 = applyUntilStabilization<simplification::evaluateDerivatives>(phase5);
+class exprStateMonad{
+public:
+	std::shared_ptr<mathEngine::expr> value;
+	template<class FN> exprStateMonad operator|(const FN& fn){
+		return exprStateMonad{fn(value)};
+	}
+};
 
-	return phase6;
+std::shared_ptr<mathEngine::expr> mathEngine::simplify(std::shared_ptr<expr> exp){
+	exprStateMonad state{exp};
+	state = state | applyUntilStabilization<simplification::reduceRationals>
+		      | applyUntilStabilization<simplification::constifyOperators>
+		      | applyUntilStabilization<simplification::unconstifyOverconstedOperators>
+		      | applyUntilStabilization<simplification::reduceSingleTermOps>
+		      | applyUntilStabilization<simplification::mergeCommutativeOperators>
+		      | applyUntilStabilization<simplification::reduceBasicArithmatic>
+		      | applyUntilStabilization<simplification::reduceSingleTermOps>
+		      | applyUntilStabilization<simplification::reduceTrig>
+		      | applyUntilStabilization<simplification::evaluateDerivatives>;
+
+	return state.value;
 }
 
 std::shared_ptr<mathEngine::expr> mathEngine::fullySimplify(std::shared_ptr<expr> exp){
@@ -35,8 +48,10 @@ std::shared_ptr<mathEngine::expr> mathEngine::fullySimplify(std::shared_ptr<expr
 	while(true){
 		exp = simplify(exp);
 		std::size_t newHash = exp->hash();
-		if(oldHash == newHash)
-			return exp;
+		if(oldHash == newHash){
+			auto againSimplified = simplify(exp);
+			return againSimplified;
+		}
 		oldHash = newHash;
 	}
 }

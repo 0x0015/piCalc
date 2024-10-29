@@ -65,3 +65,6 @@ std::size_t mathEngine::exprs::derivative::hash() const{
 	return outputHash;
 }
 
+std::string mathEngine::exprs::derivative::getTypeString() const{
+	return "D" + wrtVar + "(" + expression->getTypeString() + ")";
+}

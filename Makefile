@@ -15,6 +15,7 @@ OBJS	= main.cpp.o\
 	  mathEngine/simplifications/reduceBasicArithmatic.cpp.o \
 	  mathEngine/simplifications/reduceSingleTermOps.cpp.o \
 	  mathEngine/simplifications/evaluateDerivatives.cpp.o \
+	  mathEngine/simplifications/constifyOperators.cpp.o \
 	  mathEngine/simplifications/reduceTrig.cpp.o \
 	  parser/parseUtil.cpp.o \
 	  parser/tokenize/basicTokenize.cpp.o \
