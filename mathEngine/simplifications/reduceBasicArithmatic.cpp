@@ -20,13 +20,13 @@ std::shared_ptr<mathEngine::expr> mathEngine::simplification::reduceBasicArithma
 						if(!rationalSum)
 							rationalSum = term_rat;
 						else rationalSum = *rationalSum + term_rat;
-					}
-					if(std::holds_alternative<double>(term_const->value.value)){
+					}else if(std::holds_alternative<double>(term_const->value.value)){
 						const auto& term_real = std::get<double>(term_const->value.value);
 						if(!realSum)
 							realSum = term_real;
 						else realSum = *realSum + term_real;
-					}
+					}else	
+						otherTerms.push_back(term);
 				}else
 					otherTerms.push_back(term);
 			}
@@ -36,7 +36,7 @@ std::shared_ptr<mathEngine::expr> mathEngine::simplification::reduceBasicArithma
 				rationalTerm->value.value = *rationalSum;
 				add->terms.push_back(rationalTerm);
 			}
-			if(realSum){
+			if(realSum && *realSum != 0.0){
 				auto realTerm = std::make_shared<exprs::constant>();
 				realTerm->value.value = *realSum;
 				add->terms.push_back(realTerm);
@@ -59,13 +59,13 @@ std::shared_ptr<mathEngine::expr> mathEngine::simplification::reduceBasicArithma
 						if(!rationalProduct)
 							rationalProduct = term_rat;
 						else rationalProduct = *rationalProduct * term_rat;
-					}
-					if(std::holds_alternative<double>(term_const->value.value)){
+					}else if(std::holds_alternative<double>(term_const->value.value)){
 						const auto& term_real = std::get<double>(term_const->value.value);
 						if(!realProduct)
 							realProduct = term_real;
 						else realProduct = *realProduct * term_real;
-					}
+					}else
+						otherTerms.push_back(term);
 				}else
 					otherTerms.push_back(term);
 			}
@@ -75,7 +75,7 @@ std::shared_ptr<mathEngine::expr> mathEngine::simplification::reduceBasicArithma
 				rationalTerm->value.value = *rationalProduct;
 				mul->terms.push_back(rationalTerm);
 			}
-			if(realProduct){
+			if(realProduct && *realProduct != 1.0){
 				auto realTerm = std::make_shared<exprs::constant>();
 				realTerm->value.value = *realProduct;
 				mul->terms.push_back(realTerm);
@@ -83,8 +83,9 @@ std::shared_ptr<mathEngine::expr> mathEngine::simplification::reduceBasicArithma
 		}
 	}, true);
 
+	//multiplications by 0
 	auto retVal = exp->propegateDFS_replace([](std::shared_ptr<expr> exp)->std::optional<std::shared_ptr<expr>>{	
-		if(dynamic_cast<exprs::multiply*>(exp.get()) != nullptr){	
+		if(dynamic_cast<exprs::multiply*>(exp.get()) != nullptr){
 			auto mul = std::dynamic_pointer_cast<exprs::multiply>(exp);
 			for(const auto& term : mul->terms){
 				if(dynamic_cast<exprs::constant*>(term.get()) != nullptr){	

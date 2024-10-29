@@ -7,12 +7,15 @@ OBJS	= main.cpp.o\
 	  mathEngine/exprs/multiply.cpp.o \
 	  mathEngine/exprs/variable.cpp.o \
 	  mathEngine/exprs/derivative.cpp.o \
+	  mathEngine/exprs/sine.cpp.o \
+	  mathEngine/exprs/cosine.cpp.o \
 	  mathEngine/simplify.cpp.o \
 	  mathEngine/simplifications/reduceRationals.cpp.o \
 	  mathEngine/simplifications/mergeCommutativeOperators.cpp.o \
 	  mathEngine/simplifications/reduceBasicArithmatic.cpp.o \
 	  mathEngine/simplifications/reduceSingleTermOps.cpp.o \
 	  mathEngine/simplifications/evaluateDerivatives.cpp.o \
+	  mathEngine/simplifications/reduceTrig.cpp.o \
 	  parser/parseUtil.cpp.o \
 	  parser/tokenize/basicTokenize.cpp.o \
 	  parser/tokenize/mediumTokenize.cpp.o \
@@ -23,7 +26,8 @@ OBJS	= main.cpp.o\
 	  parser/ptParse/parseAdd.cpp.o \
 	  parser/ptParse/parseMul.cpp.o \
 	  parser/ptParse/parseConst.cpp.o \
-	  parser/ptParse/parseDerivative.cpp.o
+	  parser/ptParse/parseDerivative.cpp.o \
+	  parser/ptParse/parseTrig.cpp.o
 
 
 OUT	= main

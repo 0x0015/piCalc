@@ -1,6 +1,6 @@
 #pragma once
 #include "../equation.hpp"
-#include "../exprs/derivative.hpp"
+//#include "../exprs/derivative.hpp"
 
 namespace mathEngine{
 	namespace simplification{

@@ -120,7 +120,7 @@ std::string mathEngine::constVal::toLatex() const{
 }
 
 mathEngine::constVal mathEngine::constVal::clone() const{
-	if(!std::holds_alternative<std::shared_ptr<const expr>>(value)){
+	if(std::holds_alternative<std::shared_ptr<const expr>>(value)){
 		return constVal{std::get<std::shared_ptr<const expr>>(value)->clone()};
 	}
 	return constVal{value};

@@ -3,6 +3,7 @@
 #include "parseMul.hpp"
 #include "parseConst.hpp"
 #include "parseDerivative.hpp"
+#include "parseTrig.hpp"
 #include "../../mathEngine/exprs/variable.hpp"
 
 //don't know where else to put this
@@ -26,6 +27,9 @@ parser::parseRes<std::shared_ptr<mathEngine::expr>> parser::parseExpression(std:
 	const auto& derivative = parseDerivative(tokens);
 	if(derivative)
 		return makeParseRes<rt>(derivative->val, derivative->toksConsumed);
+	const auto& trig = parseTrigAny(tokens);
+	if(trig)
+		return makeParseRes<rt>(trig->val, trig->toksConsumed);
 	if(sk & expressionTypeToSkip::Add){
 		const auto& add = parseAdd(tokens, skip);
 		if(add)

@@ -4,16 +4,30 @@
 #include "simplifications/reduceBasicArithmatic.hpp"
 #include "simplifications/reduceSingleTermOps.hpp"
 #include "simplifications/evaluateDerivatives.hpp"
+#include "simplifications/reduceTrig.hpp"
 #include "../mathEngine/expr.hpp"
 
-std::shared_ptr<mathEngine::expr> mathEngine::simplify(std::shared_ptr<expr> exp){
-	auto phase1 = simplification::reduceRationals(exp);
-	auto phase2 = simplification::mergeCommutativeOperators(phase1);
-	auto phase3 = simplification::reduceBasicArithmatic(phase2);
-	auto phase4 = simplification::reduceSingleTermOps(phase3);
-	auto phase5 = simplification::evaluateDerivatives(phase4);
+template<auto fn> std::shared_ptr<mathEngine::expr> applyUntilStabilization(std::shared_ptr<mathEngine::expr> exp){
+	std::shared_ptr<mathEngine::expr> output = exp;
+	std::size_t oldHash = exp->hash();
+	while(true){
+		output = fn(output);
+		std::size_t newHash = exp->hash();
+		if(oldHash == newHash)
+			return output;
+		oldHash = newHash;
+	}
+}
 
-	return phase5;
+std::shared_ptr<mathEngine::expr> mathEngine::simplify(std::shared_ptr<expr> exp){
+	auto phase1 = applyUntilStabilization<simplification::reduceRationals>(exp);
+	auto phase2 = applyUntilStabilization<simplification::mergeCommutativeOperators>(phase1);
+	auto phase3 = applyUntilStabilization<simplification::reduceBasicArithmatic>(phase2);
+	auto phase4 = applyUntilStabilization<simplification::reduceSingleTermOps>(phase3);
+	auto phase5 = applyUntilStabilization<simplification::reduceTrig>(phase4);
+	auto phase6 = applyUntilStabilization<simplification::evaluateDerivatives>(phase5);
+
+	return phase6;
 }
 
 std::shared_ptr<mathEngine::expr> mathEngine::fullySimplify(std::shared_ptr<expr> exp){
