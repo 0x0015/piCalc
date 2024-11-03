@@ -3,15 +3,6 @@
 #include "variable.hpp"
 #include "../simplifications/evaluateDerivatives.hpp"
 
-mathEngine::constVal mathEngine::exprs::derivative::eval() const{
-	auto evalTry = simplification::evaluateDerivative(expression, wrtVar);
-	if(evalTry){
-		return (*evalTry)->eval();
-	}else{
-		return {};
-	}
-}
-
 //note: see the section on step size at https://en.wikipedia.org/wiki/Numerical_differentiation
 double mathEngine::exprs::derivative::evalDouble() const{
 	auto oldVal = variable::varVals[wrtVar];
@@ -26,24 +17,24 @@ double mathEngine::exprs::derivative::evalDouble() const{
 	return (upperVal-lowerVal) / dx;
 }
 
-void mathEngine::exprs::derivative::propegateDFS(const std::function<void(std::shared_ptr<expr>)>& func, bool includeConstants){
+void mathEngine::exprs::derivative::propegateDFS(const std::function<void(std::shared_ptr<expr>)>& func){
 	func(shared_from_this());
-	expression->propegateDFS(func, includeConstants);
+	expression->propegateDFS(func);
 }
 
-void mathEngine::exprs::derivative::propegateDFS_replace_internal(const expr::DFS_replacement_functype& func, bool includeConstants){
+void mathEngine::exprs::derivative::propegateDFS_replace_internal(const expr::DFS_replacement_functype& func){
 	auto res = func(expression);
 	if(res)
 		expression = *res;
 	else
-		expression->propegateDFS_replace_internal(func, includeConstants);
+		expression->propegateDFS_replace_internal(func);
 }
 
-std::shared_ptr<mathEngine::expr> mathEngine::exprs::derivative::propegateDFS_replace(const expr::DFS_replacement_functype& func, bool includeConstants){
+std::shared_ptr<mathEngine::expr> mathEngine::exprs::derivative::propegateDFS_replace(const expr::DFS_replacement_functype& func){
 	auto val = func(shared_from_this());
 	if(val)
 		return *val;
-	propegateDFS_replace_internal(func, includeConstants);
+	propegateDFS_replace_internal(func);
 	return shared_from_this();
 }
 

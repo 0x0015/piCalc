@@ -10,36 +10,27 @@ double mathEngine::exprs::add::evalDouble() const{
 	return output;
 }
 
-mathEngine::constVal mathEngine::exprs::add::eval() const{
-	if(terms.empty())
-		return {};
-	constVal output = terms.front()->eval();
-	for(unsigned int i=1;i<terms.size();i++)
-		output = output + terms[i]->eval();
-	return output;
-}
-
-void mathEngine::exprs::add::propegateDFS(const std::function<void(std::shared_ptr<expr>)>& func, bool includeConstants){
+void mathEngine::exprs::add::propegateDFS(const std::function<void(std::shared_ptr<expr>)>& func){
 	func(shared_from_this());
 	for(const auto& term : terms)
-		term->propegateDFS(func, includeConstants);
+		term->propegateDFS(func);
 }
 
-void mathEngine::exprs::add::propegateDFS_replace_internal(const expr::DFS_replacement_functype& func, bool includeConstants){
+void mathEngine::exprs::add::propegateDFS_replace_internal(const expr::DFS_replacement_functype& func){
 	for(unsigned int i=0;i<terms.size();i++){
 		auto res = func(terms[i]);
 		if(res)
 			terms[i] = *res;
 		else
-			terms[i]->propegateDFS_replace_internal(func, includeConstants);
+			terms[i]->propegateDFS_replace_internal(func);
 	}
 }
 
-std::shared_ptr<mathEngine::expr> mathEngine::exprs::add::propegateDFS_replace(const expr::DFS_replacement_functype& func, bool includeConstants){
+std::shared_ptr<mathEngine::expr> mathEngine::exprs::add::propegateDFS_replace(const expr::DFS_replacement_functype& func){
 	auto val = func(shared_from_this());
 	if(val)
 		return *val;
-	propegateDFS_replace_internal(func, includeConstants);
+	propegateDFS_replace_internal(func);
 	return shared_from_this();
 }
 

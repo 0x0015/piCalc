@@ -5,7 +5,6 @@
 #include "simplifications/reduceSingleTermOps.hpp"
 #include "simplifications/evaluateDerivatives.hpp"
 #include "simplifications/reduceTrig.hpp"
-#include "simplifications/constifyOperators.hpp"
 #include "../mathEngine/expr.hpp"
 
 template<auto fn> std::shared_ptr<mathEngine::expr> applyUntilStabilization(std::shared_ptr<mathEngine::expr> exp){
@@ -31,8 +30,6 @@ public:
 std::shared_ptr<mathEngine::expr> mathEngine::simplify(std::shared_ptr<expr> exp){
 	exprStateMonad state{exp};
 	state = state | applyUntilStabilization<simplification::reduceRationals>
-		      | applyUntilStabilization<simplification::constifyOperators>
-		      | applyUntilStabilization<simplification::unconstifyOverconstedOperators>
 		      | applyUntilStabilization<simplification::reduceSingleTermOps>
 		      | applyUntilStabilization<simplification::mergeCommutativeOperators>
 		      | applyUntilStabilization<simplification::reduceBasicArithmatic>

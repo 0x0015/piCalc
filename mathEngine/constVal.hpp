@@ -19,16 +19,16 @@ namespace mathEngine{
 	class expr;
 	class constVal{
 		public:
-		using valueType = std::variant<double, rational, constantName, std::shared_ptr<const expr>>;
+		using valueType = std::variant<double, rational, constantName>;
 		valueType value;
 		double toDouble() const;
 		std::string toLatex() const;
 		constVal clone() const;
 		std::size_t hash() const;
 	};
-	constVal operator+(const constVal& a, const constVal& b);
-	constVal operator*(const constVal& a, const constVal& b);
+	std::variant<constVal, std::shared_ptr<expr>> operator+(const constVal& a, const constVal& b);
+	std::variant<constVal, std::shared_ptr<expr>> operator*(const constVal& a, const constVal& b);
 	//the following don't really exist as unique operations, but are useful as shorthands
-	constVal operator-(const constVal& a, const constVal& b);
-	constVal operator/(const constVal& a, const constVal& b);
+	std::variant<constVal, std::shared_ptr<expr>> operator-(const constVal& a, const constVal& b);
+	std::variant<constVal, std::shared_ptr<expr>> operator/(const constVal& a, const constVal& b);
 }

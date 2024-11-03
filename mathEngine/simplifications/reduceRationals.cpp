@@ -13,7 +13,7 @@ std::shared_ptr<mathEngine::expr> mathEngine::simplification::reduceRationals(st
 				rat.denom /= commonDenom;
 			}
 		}
-	}, true);
+	});
 	return exp;
 }
 

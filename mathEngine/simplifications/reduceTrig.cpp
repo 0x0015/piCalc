@@ -1,148 +1,133 @@
 #include "reduceTrig.hpp"
-#include "../exprs/add.hpp"
 #include "../exprs/constant.hpp"
 #include "../exprs/exponent.hpp"
 #include "../exprs/multiply.hpp"
-#include "../exprs/variable.hpp"
 #include "../exprs/sine.hpp"
 #include "../exprs/cosine.hpp"
 #include <unordered_map>
 
-const std::unordered_map<rational, std::pair<mathEngine::constVal, mathEngine::constVal>> constructUnitCirclesValueList(){
-	std::unordered_map<rational, std::pair<mathEngine::constVal, mathEngine::constVal>> circle;
+std::shared_ptr<mathEngine::expr> quickConstructConstant(const mathEngine::constVal& c){
+	auto output = std::make_shared<mathEngine::exprs::constant>();
+	output->value = c;
+	return output;
+}
 
-	auto oneConst = mathEngine::constVal{rational{1,1}};
-	auto zeroConst = mathEngine::constVal{rational{0,1}};
-	auto minusOneConst = mathEngine::constVal{rational{-1,1}};
+std::shared_ptr<mathEngine::expr> quickConstructMinusOf(std::shared_ptr<mathEngine::expr> exp){
+	auto minusOneConst = quickConstructConstant(mathEngine::constVal{rational{-1,1}});
+	auto output = std::make_shared<mathEngine::exprs::multiply>();
+	output->terms = {minusOneConst, exp};
+	return output;
+}
 
-	//most basic
+const std::unordered_map<rational, std::pair<std::shared_ptr<mathEngine::expr>, std::shared_ptr<mathEngine::expr>>> constructUnitCirclesValueList(){
+	std::unordered_map<rational, std::pair<std::shared_ptr<mathEngine::expr>, std::shared_ptr<mathEngine::expr>>> circle;
+
+	auto oneConst = quickConstructConstant(mathEngine::constVal{rational{1,1}});
+	auto zeroConst = quickConstructConstant(mathEngine::constVal{rational{0,1}});
+	auto minusOneConst = quickConstructConstant(mathEngine::constVal{rational{-1,1}});
+	auto twoConst = quickConstructConstant(mathEngine::constVal{rational{2, 1}});
+	auto threeConst = quickConstructConstant(mathEngine::constVal{rational{3, 1}});
+	auto halfConst = quickConstructConstant(mathEngine::constVal{rational{1, 2}});
+	auto thirdConst = quickConstructConstant(mathEngine::constVal{rational{1, 3}});
+	auto sqrt2 = std::make_shared<mathEngine::exprs::exponent>();
+	sqrt2->base = twoConst;
+	sqrt2->exp = halfConst;
+	auto sqrt3 = std::make_shared<mathEngine::exprs::exponent>();
+	sqrt3->base = threeConst;
+	sqrt3->exp = halfConst;
+	auto sqrt2Over2 = std::make_shared<mathEngine::exprs::multiply>();
+	sqrt2Over2->terms = {sqrt2, halfConst};
+	auto sqrt3Over2 = std::make_shared<mathEngine::exprs::multiply>();
+	sqrt3Over2->terms = {sqrt3, halfConst};
+
+	//wholes and halves
 	circle[rational{0,1}] = {oneConst, zeroConst};
 	circle[rational{1,2}] = {zeroConst, oneConst};
 	circle[rational{1,1}] = {minusOneConst, zeroConst};
 	circle[rational{3,2}] = {zeroConst, minusOneConst};
 
+	//quarters
+	auto minusSqrt2Over2 = quickConstructMinusOf(sqrt2Over2);
+
+	circle[rational{1, 4}] = {sqrt2Over2, sqrt3Over2};
+	circle[rational{3, 4}] = {minusSqrt2Over2, sqrt2Over2};
+	circle[rational{5, 4}] = {minusSqrt2Over2, minusSqrt2Over2};
+	circle[rational{7, 4}] = {sqrt2Over2, minusSqrt2Over2};
+
+	//sixths
+	auto minusSqrt3Over2 = quickConstructMinusOf(sqrt3Over2);
+	auto minusHalf = quickConstructConstant(mathEngine::constVal{rational{-1, 2}});
+
+	circle[rational{1, 6}] = {sqrt3Over2, halfConst};
+	circle[rational{1, 3}] = {halfConst, sqrt3Over2};
+	circle[rational{2, 3}] = {minusHalf, sqrt3Over2};
+	circle[rational{5, 6}] = {minusSqrt3Over2, halfConst};
+	circle[rational{7, 6}] = {minusSqrt3Over2, minusHalf};
+	circle[rational{4, 3}] = {minusHalf, minusSqrt3Over2};
+	circle[rational{5, 3}] = {halfConst, minusSqrt3Over2};
+	circle[rational{11, 6}] = {sqrt3Over2, minusHalf};
+
 	return circle;
 }
 
-const std::unordered_map<rational, std::pair<mathEngine::constVal, mathEngine::constVal>> unitCircleValues = constructUnitCirclesValueList();
+const std::unordered_map<rational, std::pair<std::shared_ptr<mathEngine::expr>, std::shared_ptr<mathEngine::expr>>> unitCircleValues{constructUnitCirclesValueList()};
 
-
-std::optional<std::shared_ptr<mathEngine::expr>> mathEngine::simplification::simplifySin(std::shared_ptr<expr> exp){
-	//simplify known rational multiples of pi
-	if(dynamic_cast<exprs::constant*>(exp.get()) != nullptr){
-		const auto& constExp = std::dynamic_pointer_cast<exprs::constant>(exp);
-		if(std::holds_alternative<std::shared_ptr<const expr>>(constExp->value.value)){
-			const auto& cE_exp = std::get<std::shared_ptr<const expr>>(constExp->value.value);
-			if(dynamic_cast<const exprs::multiply*>(cE_exp.get()) != nullptr){
-				const auto& cE_mul = std::dynamic_pointer_cast<const exprs::multiply>(cE_exp);
-				//check if there are two terms which are exactly a rational, and pi -> a rational multiple of pi -> simplifiable
-				if(cE_mul->terms.size() == 2){
-					if(dynamic_cast<const exprs::constant*>(cE_mul->terms[0].get()) != nullptr && dynamic_cast<const exprs::constant*>(cE_mul->terms[1].get()) != nullptr){
-						const auto& piTerm = std::dynamic_pointer_cast<const exprs::constant>(cE_mul->terms[0]);
-						const auto& rationalTerm = std::dynamic_pointer_cast<const exprs::constant>(cE_mul->terms[1]);
-						if(std::holds_alternative<constantName>(piTerm->value.value) && std::holds_alternative<rational>(rationalTerm->value.value)){
-							const auto& rationalTerm_rat = std::get<rational>(rationalTerm->value.value);
-							const auto& piTerm_name = std::get<constantName>(piTerm->value.value);
-							if(piTerm_name == constantName::PI && unitCircleValues.contains(rationalTerm_rat)){
-								auto output = std::make_shared<exprs::constant>();
-								output->value = unitCircleValues.at(rationalTerm_rat).second;
-								return output;
-							}
-						}
+std::optional<std::pair<std::shared_ptr<mathEngine::expr>, std::shared_ptr<mathEngine::expr>>> mathEngine::simplification::getTrigVals(std::shared_ptr<expr> exp){
+	if(dynamic_cast<const exprs::multiply*>(exp.get()) != nullptr){
+		const auto& cE_mul = std::dynamic_pointer_cast<const exprs::multiply>(exp);
+		//check if there are two terms which are exactly a rational, and pi -> a rational multiple of pi -> simplifiable
+		if(cE_mul->terms.size() == 2){
+			if(dynamic_cast<const exprs::constant*>(cE_mul->terms[0].get()) != nullptr && dynamic_cast<const exprs::constant*>(cE_mul->terms[1].get()) != nullptr){
+				const auto& piTerm = std::dynamic_pointer_cast<const exprs::constant>(cE_mul->terms[0]);
+				const auto& rationalTerm = std::dynamic_pointer_cast<const exprs::constant>(cE_mul->terms[1]);
+				if(std::holds_alternative<constantName>(piTerm->value.value) && std::holds_alternative<rational>(rationalTerm->value.value)){
+					const auto& rationalTerm_rat = std::get<rational>(rationalTerm->value.value);
+					const auto& piTerm_name = std::get<constantName>(piTerm->value.value);
+					if(piTerm_name == constantName::PI && unitCircleValues.contains(rationalTerm_rat)){
+						return unitCircleValues.at(rationalTerm_rat);
 					}
 				}
 			}
 		}
+	}
+	if(dynamic_cast<exprs::constant*>(exp.get()) != nullptr){
+		const auto& constExp = std::dynamic_pointer_cast<exprs::constant>(exp);
 		if(std::holds_alternative<constantName>(constExp->value.value)){
 			const auto& constname = std::get<constantName>(constExp->value.value);
 			if(constname == constantName::PI){
-				auto output = std::make_shared<exprs::constant>();
-				output->value = unitCircleValues.at(rational{1,1}).second;
-				return output;
+				return unitCircleValues.at(rational{1,1});
 			}
 		}
 		if(std::holds_alternative<rational>(constExp->value.value)){	
 			const auto& rat = std::get<rational>(constExp->value.value);
 			if(rat == rational{0,1}){
-				auto output = std::make_shared<exprs::constant>();
-				output->value = unitCircleValues.at(rational{0,1}).second;
-				return output;
+				return unitCircleValues.at(rational{0,1});
 			}
 		}
 	}
 
-	//todo: add sin sum formula
-
 	return std::nullopt;
 }
 
-//basically copy of sin code.  Maybe make general trig lookup function and then take first or second?  TODO: refactor later
-std::optional<std::shared_ptr<mathEngine::expr>> mathEngine::simplification::simplifyCos(std::shared_ptr<expr> exp){	//simplify known rational multiples of pi
-	if(dynamic_cast<exprs::constant*>(exp.get()) != nullptr){
-		const auto& constExp = std::dynamic_pointer_cast<exprs::constant>(exp);
-		if(std::holds_alternative<std::shared_ptr<const expr>>(constExp->value.value)){
-			const auto& cE_exp = std::get<std::shared_ptr<const expr>>(constExp->value.value);
-			if(dynamic_cast<const exprs::multiply*>(cE_exp.get()) != nullptr){
-				const auto& cE_mul = std::dynamic_pointer_cast<const exprs::multiply>(cE_exp);
-				//check if there are two terms which are exactly a rational, and pi -> a rational multiple of pi -> simplifiable
-				if(cE_mul->terms.size() == 2){
-					if(dynamic_cast<const exprs::constant*>(cE_mul->terms[0].get()) != nullptr && dynamic_cast<const exprs::constant*>(cE_mul->terms[1].get()) != nullptr){
-						const auto& piTerm = std::dynamic_pointer_cast<const exprs::constant>(cE_mul->terms[0]);
-						const auto& rationalTerm = std::dynamic_pointer_cast<const exprs::constant>(cE_mul->terms[1]);
-						if(std::holds_alternative<constantName>(piTerm->value.value) && std::holds_alternative<rational>(rationalTerm->value.value)){
-							const auto& rationalTerm_rat = std::get<rational>(rationalTerm->value.value);
-							const auto& piTerm_name = std::get<constantName>(piTerm->value.value);
-							if(piTerm_name == constantName::PI && unitCircleValues.contains(rationalTerm_rat)){
-								auto output = std::make_shared<exprs::constant>();
-								output->value = unitCircleValues.at(rationalTerm_rat).first;
-								return output;
-							}
-						}
-					}
-				}
-			}
-		}
-		if(std::holds_alternative<constantName>(constExp->value.value)){
-			const auto& constname = std::get<constantName>(constExp->value.value);
-			if(constname == constantName::PI){
-				auto output = std::make_shared<exprs::constant>();
-				output->value = unitCircleValues.at(rational{1,1}).first;
-				return output;
-			}
-		}
-		if(std::holds_alternative<rational>(constExp->value.value)){	
-			const auto& rat = std::get<rational>(constExp->value.value);
-			if(rat == rational{0,1}){
-				auto output = std::make_shared<exprs::constant>();
-				output->value = unitCircleValues.at(rational{0,1}).first;
-				return output;
-			}
-		}
-	}
-
-	//todo: add cos sum formula
-
-	return std::nullopt;
-}
 
 std::shared_ptr<mathEngine::expr> mathEngine::simplification::reduceTrig(std::shared_ptr<expr> exp){
 	auto retVal = exp->propegateDFS_replace([](std::shared_ptr<expr> exp)->std::optional<std::shared_ptr<expr>>{
 		if(dynamic_cast<exprs::sine*>(exp.get()) != nullptr){
 			auto der = std::dynamic_pointer_cast<exprs::sine>(exp);
-			auto evaluated = simplifySin(der->inside);
+			const auto& evaluated = getTrigVals(der->inside);
 			if(evaluated){
-				return *evaluated;
+				return evaluated->second;
 			}
 		}
 		if(dynamic_cast<exprs::cosine*>(exp.get()) != nullptr){
 			auto der = std::dynamic_pointer_cast<exprs::cosine>(exp);
-			auto evaluated = simplifyCos(der->inside);
+			const auto& evaluated = getTrigVals(der->inside);
 			if(evaluated){
-				return *evaluated;
+				return evaluated->first;
 			}
 		}
 		return std::nullopt;
-	}, true);
+	});
 	return retVal;
 }
 

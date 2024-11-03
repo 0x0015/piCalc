@@ -1,6 +1,7 @@
 #include "equation.hpp"
 #include "expr.hpp"
 #include "hashCombine.hpp"
+#include "exprs/add.hpp"
 
 double mathEngine::equation::evalDiffDouble() const{
 	return lhs->evalDouble() - rhs->evalDouble();
@@ -10,28 +11,30 @@ double mathEngine::equation::evalUnsignedDiffDouble() const{
 	return std::abs(evalDiffDouble());
 }
 
-mathEngine::constVal mathEngine::equation::evalDiff() const{
-	return lhs->eval() - rhs->eval();
+std::shared_ptr<mathEngine::expr> mathEngine::equation::getDiff() const{
+	auto output = std::make_shared<exprs::add>();
+	output->terms = {lhs, rhs};
+	return output;
 }
 
-void mathEngine::equation::propegateDFS(const std::function<void(std::shared_ptr<expr>)>& func, bool includeConstants){
-	lhs->propegateDFS(func, includeConstants);
-	rhs->propegateDFS(func, includeConstants);
+void mathEngine::equation::propegateDFS(const std::function<void(std::shared_ptr<expr>)>& func){
+	lhs->propegateDFS(func);
+	rhs->propegateDFS(func);
 }
 
-void mathEngine::equation::propegateDFS_replace(const expr::DFS_replacement_functype& func, bool includeConstants){
+void mathEngine::equation::propegateDFS_replace(const expr::DFS_replacement_functype& func){
 	auto lhs_res = func(lhs);
 	auto rhs_res = func(rhs);
 
 	if(lhs_res)
 		lhs = *lhs_res;
 	else
-		lhs->propegateDFS_replace(func, includeConstants);
+		lhs->propegateDFS_replace(func);
 
 	if(rhs_res)
 		rhs = *rhs_res;
 	else
-		rhs->propegateDFS_replace(func, includeConstants);
+		rhs->propegateDFS_replace(func);
 }
 
 std::string mathEngine::equation::toLatex() const{
@@ -50,3 +53,12 @@ std::size_t mathEngine::equation::hash() const{
 	mathEngine::hash_combine(lhsHash, rhs->hash(), COMPILE_TIME_CRC32_STR("equation"));
 	return lhsHash;
 }
+
+mathEngine::equation mathEngine::equation::substiteVariable(const std::string& varName, std::shared_ptr<expr> subVal){
+	equation output;
+	output.lhs = lhs->substiteVariable(varName, subVal);
+	output.rhs = rhs->substiteVariable(varName, subVal);
+	return output;
+}
+
+

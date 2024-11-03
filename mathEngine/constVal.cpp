@@ -11,8 +11,6 @@ double mathEngine::constVal::toDouble() const{
 		return std::get<double>(value);
 	}else if(std::holds_alternative<rational>(value)){
 		return std::get<rational>(value).toDouble();
-	}else if(std::holds_alternative<std::shared_ptr<const expr>>(value)){
-		return std::get<std::shared_ptr<const expr>>(value)->evalDouble();
 	}else if(std::holds_alternative<constantName>(value)){
 		return constantDoubleValues[std::get<constantName>(value)];
 	}else{
@@ -20,12 +18,15 @@ double mathEngine::constVal::toDouble() const{
 	}
 }
 
-mathEngine::constVal mathEngine::operator+(const mathEngine::constVal& a, const mathEngine::constVal& b){
-	mathEngine::constVal output;
+std::variant<mathEngine::constVal, std::shared_ptr<mathEngine::expr>> mathEngine::operator+(const mathEngine::constVal& a, const mathEngine::constVal& b){
 	if(std::holds_alternative<rational>(a.value) && std::holds_alternative<rational>(b.value)){
+		mathEngine::constVal output;
 		output.value = std::get<rational>(a.value) + std::get<rational>(b.value);
+		return output;
 	}else if(std::holds_alternative<double>(a.value) && std::holds_alternative<double>(b.value)){
+		mathEngine::constVal output;
 		output.value = std::get<double>(a.value) + std::get<double>(b.value);
+		return output;
 	}else{
 		auto add = std::make_shared<mathEngine::exprs::add>();
 		auto lhs = std::make_shared<mathEngine::exprs::constant>();
@@ -33,12 +34,11 @@ mathEngine::constVal mathEngine::operator+(const mathEngine::constVal& a, const 
 		lhs->value = a;
 		rhs->value = b;
 		add->terms = {lhs, rhs};
-		output.value = add;
+		return add;
 	}
-	return output;
 }
 
-mathEngine::constVal mathEngine::operator-(const mathEngine::constVal& a, const mathEngine::constVal& b){
+std::variant<mathEngine::constVal, std::shared_ptr<mathEngine::expr>> mathEngine::operator-(const mathEngine::constVal& a, const mathEngine::constVal& b){
 	mathEngine::constVal output;
 	if(std::holds_alternative<rational>(a.value) && std::holds_alternative<rational>(b.value)){
 		output.value = std::get<rational>(a.value) - std::get<rational>(b.value);
@@ -55,12 +55,12 @@ mathEngine::constVal mathEngine::operator-(const mathEngine::constVal& a, const 
 		minusOneConst->value.value = rational(-1, 1);
 		smul->terms = {minusOneConst, rhs};
 		add->terms = {lhs, smul};
-		output.value = add;
+		return add;
 	}
 	return output;
 }
 
-mathEngine::constVal mathEngine::operator*(const mathEngine::constVal& a, const mathEngine::constVal& b){
+std::variant<mathEngine::constVal, std::shared_ptr<mathEngine::expr>> mathEngine::operator*(const mathEngine::constVal& a, const mathEngine::constVal& b){
 	mathEngine::constVal output;
 	if(std::holds_alternative<rational>(a.value) && std::holds_alternative<rational>(b.value)){
 		output.value = std::get<rational>(a.value) * std::get<rational>(b.value);
@@ -73,12 +73,12 @@ mathEngine::constVal mathEngine::operator*(const mathEngine::constVal& a, const 
 		lhs->value = a;
 		rhs->value = b;
 		mul->terms = {lhs, rhs};
-		output.value = mul;
+		return mul;
 	}
 	return output;
 }
 
-mathEngine::constVal mathEngine::operator/(const mathEngine::constVal& a, const mathEngine::constVal& b){
+std::variant<mathEngine::constVal, std::shared_ptr<mathEngine::expr>> mathEngine::operator/(const mathEngine::constVal& a, const mathEngine::constVal& b){
 	mathEngine::constVal output;
 	if(std::holds_alternative<rational>(a.value) && std::holds_alternative<rational>(b.value)){
 		output.value = std::get<rational>(a.value) / std::get<rational>(b.value);
@@ -96,7 +96,7 @@ mathEngine::constVal mathEngine::operator/(const mathEngine::constVal& a, const 
 		sexp->exp = minusOneConst;
 		sexp->base = rhs;
 		mul->terms = {lhs, sexp};
-		output.value = mul;
+		return mul;
 	}
 	return output;
 }
@@ -110,8 +110,6 @@ std::string mathEngine::constVal::toLatex() const{
 			return std::to_string(rat.num);
 		else
 			return "\\frac{" + std::to_string(rat.num) + "}{" + std::to_string(rat.denom) + "}";
-	}else if(std::holds_alternative<std::shared_ptr<const expr>>(value)){
-		return std::get<std::shared_ptr<const expr>>(value)->toLatex();
 	}else if(std::holds_alternative<constantName>(value)){
 		return std::string(constantLatexNames[std::get<constantName>(value)]);
 	}else{
@@ -120,9 +118,6 @@ std::string mathEngine::constVal::toLatex() const{
 }
 
 mathEngine::constVal mathEngine::constVal::clone() const{
-	if(std::holds_alternative<std::shared_ptr<const expr>>(value)){
-		return constVal{std::get<std::shared_ptr<const expr>>(value)->clone()};
-	}
 	return constVal{value};
 }
 
@@ -134,10 +129,6 @@ std::size_t mathEngine::constVal::hash() const{
 		std::size_t output = std::hash<int>{}(rat.num);
 		mathEngine::hash_combine(output, rat.denom);
 		return output;
-	}else if(std::holds_alternative<std::shared_ptr<const expr>>(value)){
-		std::size_t hash =  std::get<std::shared_ptr<const expr>>(value)->hash();
-		hash_combine(hash, COMPILE_TIME_CRC32_STR("constVal expr sub"));
-		return hash;
 	}else if(std::holds_alternative<constantName>(value)){
 		return std::hash<int>{}(std::get<constantName>(value));
 	}else{

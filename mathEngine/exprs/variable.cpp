@@ -5,22 +5,18 @@ double mathEngine::exprs::variable::evalDouble() const{
 	return varVals[name].toDouble();
 }
 
-mathEngine::constVal mathEngine::exprs::variable::eval() const{
-	return varVals[name];
-}
-
-void mathEngine::exprs::variable::propegateDFS(const std::function<void(std::shared_ptr<expr>)>& func, bool includeConstants){
+void mathEngine::exprs::variable::propegateDFS(const std::function<void(std::shared_ptr<expr>)>& func){
 	func(shared_from_this());
 }
 
-void mathEngine::exprs::variable::propegateDFS_replace_internal(const expr::DFS_replacement_functype& func, bool includeConstants){
+void mathEngine::exprs::variable::propegateDFS_replace_internal(const expr::DFS_replacement_functype& func){
 	//non
 }
-std::shared_ptr<mathEngine::expr> mathEngine::exprs::variable::propegateDFS_replace(const expr::DFS_replacement_functype& func, bool includeConstants){
+std::shared_ptr<mathEngine::expr> mathEngine::exprs::variable::propegateDFS_replace(const expr::DFS_replacement_functype& func){
 	auto res = func(shared_from_this());
 	if(res)
 		return *res;
-	propegateDFS_replace_internal(func, includeConstants);
+	propegateDFS_replace_internal(func);
 	return shared_from_this();
 }
 

@@ -22,7 +22,7 @@ std::optional<parser::parseResult> parser::ptParse::parse(const std::string_view
 				res.vars.insert(var->name);
 				mathEngine::exprs::variable::varVals[var->name] = mathEngine::constVal{rational(1,1)}; //just some default value
 			}
-		}, false);
+		});
 	};
 
 	const auto& parsedEq = parseEquation(*mediumToks);

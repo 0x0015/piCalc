@@ -8,35 +8,17 @@ double mathEngine::exprs::constant::evalDouble() const{
 	return value.toDouble();
 }
 
-mathEngine::constVal mathEngine::exprs::constant::eval() const{
-	return value;
-}
-
-void mathEngine::exprs::constant::propegateDFS(const std::function<void(std::shared_ptr<expr>)>& func, bool includeConstants){
+void mathEngine::exprs::constant::propegateDFS(const std::function<void(std::shared_ptr<expr>)>& func){
 	func(shared_from_this());
-	if(includeConstants && std::holds_alternative<std::shared_ptr<const expr>>(value.value)){
-		auto constShared = std::get<std::shared_ptr<const expr>>(value.value);
-		auto shared = std::const_pointer_cast<expr>(constShared); //illegal jank, but permissable for now
-		shared->propegateDFS(func, includeConstants);
-	}
 }
 
-void mathEngine::exprs::constant::propegateDFS_replace_internal(const expr::DFS_replacement_functype& func, bool includeConstants){
-	if(includeConstants && std::holds_alternative<std::shared_ptr<const expr>>(value.value)){
-		auto& constShared = std::get<std::shared_ptr<const expr>>(value.value);
-		auto shared = std::const_pointer_cast<expr>(constShared); //illegal jank, but permissable for now
-		auto res = func(shared);
-		if(res)
-			constShared = *res;
-		else
-			shared->propegateDFS_replace_internal(func, includeConstants);
-	}
-}
-std::shared_ptr<mathEngine::expr> mathEngine::exprs::constant::propegateDFS_replace(const expr::DFS_replacement_functype& func, bool includeConstants){
+void mathEngine::exprs::constant::propegateDFS_replace_internal(const expr::DFS_replacement_functype& func){}
+
+std::shared_ptr<mathEngine::expr> mathEngine::exprs::constant::propegateDFS_replace(const expr::DFS_replacement_functype& func){
 	auto res = func(shared_from_this());
 	if(res)
 		return *res;
-	propegateDFS_replace_internal(func, includeConstants);
+	propegateDFS_replace_internal(func);
 	return shared_from_this();
 }
 
@@ -57,8 +39,5 @@ std::size_t mathEngine::exprs::constant::hash() const{
 }
 
 std::string mathEngine::exprs::constant::getTypeString() const{
-	if(std::holds_alternative<std::shared_ptr<const expr>>(value.value)){
-		return "(constant) " + std::get<std::shared_ptr<const expr>>(value.value)->getTypeString();
-	}
 	return "constant";
 }

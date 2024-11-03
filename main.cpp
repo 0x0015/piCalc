@@ -47,7 +47,9 @@ int main(int argc, char** argv){
 					if(mediumTokens){
 						auto constant = parser::parseConst(*mediumTokens);
 						mathEngine::exprs::variable::varVals[evalVarName] = constant->val->value;
-						std::cout<<"Evaluated at "<<evalVarName<<"="<<constant->val->value.toLatex()<<": "<<exp->eval().toLatex()<<" (decimal: "<<exp->evalDouble()<<")"<<std::endl;
+						auto subbedEq = simplified->substiteVariable(evalVarName, constant->val);
+						auto simplifiedSubbedEq = mathEngine::fullySimplify(subbedEq);
+						std::cout<<"Evaluated at "<<evalVarName<<"="<<constant->val->value.toLatex()<<": "<<simplifiedSubbedEq->toLatex()<<" (decimal: "<<simplifiedSubbedEq->evalDouble()<<")"<<std::endl;
 					}
 				}
 			}

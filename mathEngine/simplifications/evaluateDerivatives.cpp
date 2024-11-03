@@ -5,6 +5,8 @@
 #include "../exprs/multiply.hpp"
 #include "../exprs/variable.hpp"
 #include "../exprs/derivative.hpp"
+#include "../exprs/sine.hpp"
+#include "../exprs/cosine.hpp"
 
 std::optional<std::shared_ptr<mathEngine::expr>> getDerivativeOf(std::shared_ptr<mathEngine::exprs::add> add, std::string_view wrtVar){
 	auto output = std::make_shared<mathEngine::exprs::add>();
@@ -58,6 +60,30 @@ std::optional<std::shared_ptr<mathEngine::expr>> getDerivativeOf(std::shared_ptr
 	//this is good enough, because in the next pass, the newly generated derivatives will be evaluated
 }
 
+std::optional<std::shared_ptr<mathEngine::expr>> getDerivativeOf(std::shared_ptr<mathEngine::exprs::sine> sine, std::string_view wrtVar){
+	auto output = std::make_shared<mathEngine::exprs::multiply>();
+	auto cosine = std::make_shared<mathEngine::exprs::cosine>();
+	cosine->inside = sine->inside;
+	auto insidePrime = std::make_shared<mathEngine::exprs::derivative>();
+	insidePrime->expression = sine->inside;
+	insidePrime->wrtVar = wrtVar;
+	output->terms = {cosine, insidePrime};
+	return output;
+}
+
+std::optional<std::shared_ptr<mathEngine::expr>> getDerivativeOf(std::shared_ptr<mathEngine::exprs::cosine> cosine, std::string_view wrtVar){
+	auto output = std::make_shared<mathEngine::exprs::multiply>();
+	auto sine = std::make_shared<mathEngine::exprs::cosine>();
+	sine->inside = cosine->inside;
+	auto insidePrime = std::make_shared<mathEngine::exprs::derivative>();
+	insidePrime->expression = cosine->inside;
+	insidePrime->wrtVar = wrtVar;
+	auto minus1Const = std::make_shared<mathEngine::exprs::constant>();
+	minus1Const->value = mathEngine::constVal{rational{-1, 1}};
+	output->terms = {minus1Const, sine, insidePrime};
+	return output;
+}
+
 std::optional<std::shared_ptr<mathEngine::expr>> getDerivativeOf(std::shared_ptr<mathEngine::exprs::variable> var, std::string_view wrtVar){
 	auto output = std::make_shared<mathEngine::exprs::constant>();
 	if(var->name == wrtVar)
@@ -83,6 +109,10 @@ std::optional<std::shared_ptr<mathEngine::expr>> mathEngine::simplification::eva
 		return getDerivativeOf(std::dynamic_pointer_cast<exprs::multiply>(der), wrtVar);
 	}else if(isSubclass<exprs::variable>(der)){
 		return getDerivativeOf(std::dynamic_pointer_cast<exprs::variable>(der), wrtVar);
+	}else if(isSubclass<exprs::sine>(der)){
+		return getDerivativeOf(std::dynamic_pointer_cast<exprs::sine>(der), wrtVar);
+	}else if(isSubclass<exprs::cosine>(der)){
+		return getDerivativeOf(std::dynamic_pointer_cast<exprs::cosine>(der), wrtVar);
 	}
 	return std::nullopt;
 }
@@ -97,7 +127,7 @@ std::shared_ptr<mathEngine::expr> mathEngine::simplification::evaluateDerivative
 			}
 		}
 		return std::nullopt;
-	}, true);
+	});
 	return retVal;
 }
 

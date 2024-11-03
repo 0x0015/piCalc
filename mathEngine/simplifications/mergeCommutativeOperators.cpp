@@ -20,7 +20,7 @@ std::shared_ptr<mathEngine::expr> mathEngine::simplification::mergeCommutativeOp
 			}
 			add->terms = newTerms;
 		}
-	}, true);
+	});
 
 	//muls
 	exp->propegateDFS([](std::shared_ptr<expr> exp){
@@ -37,7 +37,7 @@ std::shared_ptr<mathEngine::expr> mathEngine::simplification::mergeCommutativeOp
 			}
 			mult->terms = newTerms;
 		}
-	}, true);
+	});
 	return exp;
 }
 

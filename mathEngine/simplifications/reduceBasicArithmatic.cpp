@@ -42,7 +42,7 @@ std::shared_ptr<mathEngine::expr> mathEngine::simplification::reduceBasicArithma
 				add->terms.push_back(realTerm);
 			}
 		}
-	}, true);
+	});
 
 	//muls
 	exp->propegateDFS([](std::shared_ptr<expr> exp){
@@ -81,7 +81,7 @@ std::shared_ptr<mathEngine::expr> mathEngine::simplification::reduceBasicArithma
 				mul->terms.push_back(realTerm);
 			}
 		}
-	}, true);
+	});
 
 	//multiplications by 0
 	auto retVal = exp->propegateDFS_replace([](std::shared_ptr<expr> exp)->std::optional<std::shared_ptr<expr>>{	
@@ -102,7 +102,7 @@ std::shared_ptr<mathEngine::expr> mathEngine::simplification::reduceBasicArithma
 			}
 		}
 		return std::nullopt;
-	}, true);
+	});
 	return retVal;
 }
 

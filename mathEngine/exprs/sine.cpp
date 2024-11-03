@@ -6,29 +6,25 @@ double mathEngine::exprs::sine::evalDouble() const{
 	return std::sin(inside->evalDouble());
 }
 
-mathEngine::constVal mathEngine::exprs::sine::eval() const{
-	return {shared_from_this()};//can be simplified in certain, cases.  will be handled in a simplification pass though
-}
-
-void mathEngine::exprs::sine::propegateDFS(const std::function<void(std::shared_ptr<expr>)>& func, bool includeConstants){
+void mathEngine::exprs::sine::propegateDFS(const std::function<void(std::shared_ptr<expr>)>& func){
 	func(shared_from_this());
-	inside->propegateDFS(func, includeConstants);
+	inside->propegateDFS(func);
 }
 
-void mathEngine::exprs::sine::propegateDFS_replace_internal(const expr::DFS_replacement_functype& func, bool includeConstants){
+void mathEngine::exprs::sine::propegateDFS_replace_internal(const expr::DFS_replacement_functype& func){
 	auto ins_res = func(inside);
 
 	if(ins_res)
 		inside = *ins_res;
 	else
-		inside->propegateDFS_replace_internal(func, includeConstants);
+		inside->propegateDFS_replace_internal(func);
 }
 
-std::shared_ptr<mathEngine::expr> mathEngine::exprs::sine::propegateDFS_replace(const expr::DFS_replacement_functype& func, bool includeConstants){
+std::shared_ptr<mathEngine::expr> mathEngine::exprs::sine::propegateDFS_replace(const expr::DFS_replacement_functype& func){
 	auto res = func(shared_from_this());
 	if(res)
 		return *res;
-	propegateDFS_replace_internal(func, includeConstants);
+	propegateDFS_replace_internal(func);
 	return shared_from_this();
 }
 

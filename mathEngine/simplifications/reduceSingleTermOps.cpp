@@ -20,7 +20,7 @@ std::shared_ptr<mathEngine::expr> mathEngine::simplification::reduceSingleTermOp
 			}
 		}
 		return std::nullopt;
-	}, true);
+	});
 
 	return retVal;
 }
