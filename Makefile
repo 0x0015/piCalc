@@ -1,5 +1,4 @@
-OBJS	= main.cpp.o\
-	  mathEngine/constVal.cpp.o \
+OBJS	= mathEngine/constVal.cpp.o \
 	  mathEngine/expr.cpp.o \
 	  mathEngine/equation.cpp.o \
 	  mathEngine/exprs/add.cpp.o \
@@ -41,8 +40,8 @@ BUILD_CXX_FLAGS	 = -Wall -std=c++20 -g -Wno-reorder
 BUILD_CC_FLAGS   =
 LINK_OPTS	 = 
 
-all: $(OBJS)
-	$(CC_ACCEL) $(CXX) $(OBJS) -o $(OUT) $(LINK_OPTS)
+all: $(OBJS) main.cpp.o
+	$(CC_ACCEL) $(CXX) $(OBJS) main.cpp.o -o $(OUT) $(LINK_OPTS)
 
 static: $(OBJS)
 	$(AR) rvs $(STATIC_OUT) $(OBJS)
