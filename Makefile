@@ -32,8 +32,10 @@ OBJS	= main.cpp.o\
 
 
 OUT	= main
+STATIC_OUT = piCalc.a
 CXX	= g++
 CC      = gcc
+AR      = ar
 CC_ACCEL = ccache
 BUILD_CXX_FLAGS	 = -Wall -std=c++20 -g -Wno-reorder
 BUILD_CC_FLAGS   =
@@ -42,6 +44,9 @@ LINK_OPTS	 =
 all: $(OBJS)
 	$(CC_ACCEL) $(CXX) $(OBJS) -o $(OUT) $(LINK_OPTS)
 
+static: $(OBJS)
+	$(AR) rvs $(STATIC_OUT) $(OBJS)
+
 %.cpp.o: %.cpp
 	$(CC_ACCEL) $(CXX) $< $(BUILD_CXX_FLAGS) -g -c -o $@
 
@@ -49,4 +54,4 @@ all: $(OBJS)
 	$(CC_ACCEL) $(CXX) $< $(BUILD_CXX_FLAGS) -g -c -o $@
 
 clean:
-	rm -f $(OBJS) $(OUT)
+	rm -f $(OBJS) $(OUT) $(STATIC_OUT)
