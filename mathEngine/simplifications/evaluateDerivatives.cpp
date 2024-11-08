@@ -73,7 +73,7 @@ std::optional<std::shared_ptr<mathEngine::expr>> getDerivativeOf(std::shared_ptr
 
 std::optional<std::shared_ptr<mathEngine::expr>> getDerivativeOf(std::shared_ptr<mathEngine::exprs::cosine> cosine, std::string_view wrtVar){
 	auto output = std::make_shared<mathEngine::exprs::multiply>();
-	auto sine = std::make_shared<mathEngine::exprs::cosine>();
+	auto sine = std::make_shared<mathEngine::exprs::sine>();
 	sine->inside = cosine->inside;
 	auto insidePrime = std::make_shared<mathEngine::exprs::derivative>();
 	insidePrime->expression = cosine->inside;
