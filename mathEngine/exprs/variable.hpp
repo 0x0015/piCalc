@@ -17,6 +17,7 @@ namespace mathEngine{
 				std::shared_ptr<expr> clone() const override;
 				std::size_t hash() const override;
 				std::string getTypeString() const override;
+				std::string toCode(const std::unordered_set<std::string>& wrtVars) const override;
 		};
 	}
 }

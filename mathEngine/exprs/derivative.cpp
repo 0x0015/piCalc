@@ -43,6 +43,10 @@ std::string mathEngine::exprs::derivative::toLatex() const{
 	return "D_" + (wrtVar.size() == 1 ? wrtVar : "{" + wrtVar + "}") + " " + expression->toLatex();
 }
 
+std::string mathEngine::exprs::derivative::toCode(const std::unordered_set<std::string>& wrtVars) const{
+	return "0.0";//fill in later
+}
+
 std::shared_ptr<mathEngine::expr> mathEngine::exprs::derivative::clone() const{
 	auto output = std::make_shared<derivative>();
 	output->expression = expression->clone();

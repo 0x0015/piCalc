@@ -39,6 +39,10 @@ std::string mathEngine::exprs::exponent::toLatex() const{
 	return "{" + base->toLatex() + "}^{" + exp->toLatex() + "}";
 }
 
+std::string mathEngine::exprs::exponent::toCode(const std::unordered_set<std::string>& wrtVars) const{
+	return "pow(" + base->toCode(wrtVars) + ", " + exp->toCode(wrtVars) + ")";
+}
+
 std::shared_ptr<mathEngine::expr> mathEngine::exprs::exponent::clone() const{
 	auto output = std::make_shared<exponent>();
 	output->base = base->clone();

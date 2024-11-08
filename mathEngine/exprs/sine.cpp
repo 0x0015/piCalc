@@ -32,6 +32,10 @@ std::string mathEngine::exprs::sine::toLatex() const{
 	return "\\sin{" + inside->toLatex() + "}";
 }
 
+std::string mathEngine::exprs::sine::toCode(const std::unordered_set<std::string>& wrtVars) const{
+	return "sin(" + inside->toCode(wrtVars) + ")";
+}
+
 std::shared_ptr<mathEngine::expr> mathEngine::exprs::sine::clone() const{
 	auto output = std::make_shared<sine>();
 	output->inside = inside->clone();

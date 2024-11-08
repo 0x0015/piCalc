@@ -45,6 +45,17 @@ std::string mathEngine::exprs::add::toLatex() const{
 	return output;
 }
 
+std::string mathEngine::exprs::add::toCode(const std::unordered_set<std::string>& wrtVars) const{
+	std::string output = "(";
+	for(unsigned int i=0;i<terms.size();i++){
+		output += terms[i]->toCode(wrtVars);
+		if(i+1 < terms.size())
+			output += '+';
+	}
+	output += ')';
+	return output;
+}
+
 std::shared_ptr<mathEngine::expr> mathEngine::exprs::add::clone() const{
 	auto output = std::make_shared<add>();
 	for(const auto& term : terms)

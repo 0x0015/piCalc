@@ -2,6 +2,7 @@
 #include <functional>
 #include <memory>
 #include <optional>
+#include <unordered_set>
 #include "constVal.hpp"
 
 namespace mathEngine{
@@ -20,6 +21,7 @@ namespace mathEngine{
 		virtual std::shared_ptr<expr> clone() const = 0;
 		virtual std::size_t hash() const = 0;
 		virtual std::string getTypeString() const = 0;
+		virtual std::string toCode(const std::unordered_set<std::string>& wrtVars) const = 0;
 		std::shared_ptr<expr> substiteVariable(const std::string& varName, std::shared_ptr<expr> subVal);
 	};
 }

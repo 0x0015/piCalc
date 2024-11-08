@@ -32,6 +32,10 @@ std::string mathEngine::exprs::cosine::toLatex() const{
 	return "\\cos{" + inside->toLatex() + "}";
 }
 
+std::string mathEngine::exprs::cosine::toCode(const std::unordered_set<std::string>& wrtVars) const{
+	return "cos(" + inside->toCode(wrtVars) + ")";
+}
+
 std::shared_ptr<mathEngine::expr> mathEngine::exprs::cosine::clone() const{
 	auto output = std::make_shared<cosine>();
 	output->inside = inside->clone();

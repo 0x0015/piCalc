@@ -24,6 +24,13 @@ std::string mathEngine::exprs::variable::toLatex() const{
 	return name;
 }
 
+std::string mathEngine::exprs::variable::toCode(const std::unordered_set<std::string>& wrtVars) const{
+	if(wrtVars.contains(name)){
+		return name;
+	}
+	return std::to_string(evalDouble());
+}
+
 std::shared_ptr<mathEngine::expr> mathEngine::exprs::variable::clone() const{
 	auto output = std::make_shared<variable>();
 	output->name = name;

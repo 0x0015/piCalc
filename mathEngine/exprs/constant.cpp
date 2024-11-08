@@ -26,6 +26,10 @@ std::string mathEngine::exprs::constant::toLatex() const{
 	return value.toLatex();
 }
 
+std::string mathEngine::exprs::constant::toCode(const std::unordered_set<std::string>& wrtVars) const{
+	return std::to_string(value.toDouble());
+}
+
 std::shared_ptr<mathEngine::expr> mathEngine::exprs::constant::clone() const{
 	auto output = std::make_shared<constant>();
 	output->value = value.clone();

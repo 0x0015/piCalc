@@ -2,6 +2,8 @@
 #include "expr.hpp"
 #include "hashCombine.hpp"
 #include "exprs/add.hpp"
+#include "exprs/constant.hpp"
+#include "exprs/multiply.hpp"
 
 double mathEngine::equation::evalDiffDouble() const{
 	return lhs->evalDouble() - rhs->evalDouble();
@@ -13,7 +15,11 @@ double mathEngine::equation::evalUnsignedDiffDouble() const{
 
 std::shared_ptr<mathEngine::expr> mathEngine::equation::getDiff() const{
 	auto output = std::make_shared<exprs::add>();
-	output->terms = {lhs, rhs};
+	auto minus1Const = std::make_shared<exprs::constant>();
+	minus1Const->value = constVal{rational{-1,1}};
+	auto mult = std::make_shared<exprs::multiply>();
+	mult->terms = {minus1Const, rhs};
+	output->terms = {lhs, mult};
 	return output;
 }
 

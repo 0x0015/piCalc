@@ -35,11 +35,21 @@ std::shared_ptr<mathEngine::expr> mathEngine::exprs::multiply::propegateDFS_repl
 }
 
 std::string mathEngine::exprs::multiply::toLatex() const{
-	std::string output;;
+	std::string output;
 	for(unsigned int i=0;i<terms.size();i++){
 		output += terms[i]->toLatex();
 		if(i+1 < terms.size())
 			output += " \\cdot ";
+	}
+	return output;
+}
+
+std::string mathEngine::exprs::multiply::toCode(const std::unordered_set<std::string>& wrtVars) const{
+	std::string output;
+	for(unsigned int i=0;i<terms.size();i++){
+		output += terms[i]->toCode(wrtVars);
+		if(i+1 < terms.size())
+			output += " * ";
 	}
 	return output;
 }

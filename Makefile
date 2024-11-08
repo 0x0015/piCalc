@@ -53,4 +53,4 @@ static: $(OBJS)
 	$(CC_ACCEL) $(CXX) $< $(BUILD_CXX_FLAGS) -g -c -o $@
 
 clean:
-	rm -f $(OBJS) $(OUT) $(STATIC_OUT)
+	rm -f $(OBJS) $(OUT) $(STATIC_OUT) main.cpp.o
