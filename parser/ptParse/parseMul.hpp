@@ -7,4 +7,5 @@
 
 namespace parser{
 	parseRes<std::shared_ptr<mathEngine::exprs::multiply>> parseMul(std::span<const mediumToken> tokens, expressionTypeToSkip skip = None);
+	parseRes<std::shared_ptr<mathEngine::exprs::multiply>> parseDiv(std::span<const mediumToken> tokens, expressionTypeToSkip skip = None);
 }

@@ -40,7 +40,7 @@ std::shared_ptr<mathEngine::expr> mathEngine::exprs::derivative::propegateDFS_re
 
 
 std::string mathEngine::exprs::derivative::toLatex() const{
-	return "D_" + (wrtVar.size() == 1 ? wrtVar : "{" + wrtVar + "}") + " " + expression->toLatex();
+	return "D_" + (wrtVar.size() == 1 ? wrtVar : "{" + wrtVar + "}") + "(" + expression->toLatex() + ")";
 }
 
 std::string mathEngine::exprs::derivative::toCode(const std::unordered_set<std::string>& wrtVars) const{

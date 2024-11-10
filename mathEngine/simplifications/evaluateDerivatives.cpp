@@ -7,6 +7,7 @@
 #include "../exprs/derivative.hpp"
 #include "../exprs/sine.hpp"
 #include "../exprs/cosine.hpp"
+#include "../exprs/logarithm.hpp"
 
 std::optional<std::shared_ptr<mathEngine::expr>> getDerivativeOf(std::shared_ptr<mathEngine::exprs::add> add, std::string_view wrtVar){
 	auto output = std::make_shared<mathEngine::exprs::add>();
@@ -25,12 +26,100 @@ std::optional<std::shared_ptr<mathEngine::expr>> getDerivativeOf(std::shared_ptr
 	return output;
 }
 
-std::optional<std::shared_ptr<mathEngine::expr>> getDerivativeOf(std::shared_ptr<mathEngine::exprs::exponent> constant, std::string_view wrtVar){
-	//implement once logarithms exist
-	return std::nullopt;
+std::optional<std::shared_ptr<mathEngine::expr>> getDerivativeOf(std::shared_ptr<mathEngine::exprs::exponent> exp, std::string_view wrtVar){
+	//Dx (f(x)^g(x)) = f(x)^(g(x) - 1) (g(x) f'(x) + f(x) ln(f(x)) g'(x))
+	
+	const auto& f = exp->base;
+	const auto& g = exp->exp;
+
+	auto output = std::make_shared<mathEngine::exprs::multiply>(); //whole thing
+	auto term0 = std::make_shared<mathEngine::exprs::exponent>(); //f(x)^(g(x) - 1)
+	auto term0_0 = std::make_shared<mathEngine::exprs::add>(); //g(x)-1
+	auto term1 = std::make_shared<mathEngine::exprs::add>(); //g(x) f'(x) + f(x) log(f(x)) g'(x)
+	auto term1_0 = std::make_shared<mathEngine::exprs::multiply>(); //g(x) f'(x)
+	auto term1_0_0 = std::make_shared<mathEngine::exprs::derivative>(); //f'(x)
+	auto term1_1 = std::make_shared<mathEngine::exprs::multiply>(); //f(x) ln(f(x)) g'(x)
+	auto term1_1_0 = std::make_shared<mathEngine::exprs::logarithm>(); //ln(f(x))
+	auto term1_1_1 = std::make_shared<mathEngine::exprs::derivative>(); //g'(x)
+
+	auto minusOneConst = std::make_shared<mathEngine::exprs::constant>();
+	minusOneConst->value = mathEngine::constVal{rational{-1, 1}};
+	auto eConst = std::make_shared<mathEngine::exprs::constant>();
+	eConst->value = mathEngine::constVal{mathEngine::constantName::E};
+
+	output->terms = {term0, term1};
+
+	term0->base = f;
+	term0->exp = term0_0;
+	term0_0->terms = {g, minusOneConst};
+
+	term1->terms = {term1_0, term1_1};
+
+	term1_0->terms = {g, term1_0_0};
+	term1_0_0->expression = f;
+	term1_0_0->wrtVar = wrtVar;
+
+	term1_1->terms = {f, term1_1_0, term1_1_1};
+	term1_1_0->base = eConst;
+	term1_1_0->inside = f;
+	term1_1_1->expression = g;
+	term1_1_1->wrtVar = wrtVar;
+
+	return output;
+}
+
+std::optional<std::shared_ptr<mathEngine::expr>> getDerivativeOf(std::shared_ptr<mathEngine::exprs::logarithm> log, std::string_view wrtVar){
+	auto minusOneConst = std::make_shared<mathEngine::exprs::constant>();
+	minusOneConst->value = mathEngine::constVal{rational{-1, 1}};
+
+	//this NEEDS to be checked first, otherwise the below creates an infinite derivative expansion, as the ln derivatives don't get simplified before more are made
+	if(dynamic_cast<mathEngine::exprs::constant*>(log->base.get()) != nullptr){
+		const auto& logBaseConst = std::dynamic_pointer_cast<mathEngine::exprs::constant>(log->base);
+		if(std::holds_alternative<mathEngine::constantName>(logBaseConst->value.value) && std::get<mathEngine::constantName>(logBaseConst->value.value) == mathEngine::constantName::E){
+			//it's a natural log!  Dx ln(f(x)) = (Dx f(x))/f(x)
+			auto output = std::make_shared<mathEngine::exprs::multiply>();
+			
+			auto rhs = std::make_shared<mathEngine::exprs::derivative>();
+			rhs->expression = log->inside;
+			rhs->wrtVar = wrtVar;
+
+			auto lhs = std::make_shared<mathEngine::exprs::exponent>();
+			lhs->exp = minusOneConst;
+			lhs->base = log->inside;
+
+			output->terms = {rhs, lhs};
+
+			return output;
+		}
+	}
+
+	//Dx log_{g(x)} (f(x)) = Dx ln(f(x))/ln(g(x))
+	auto eConst = std::make_shared<mathEngine::exprs::constant>();
+	eConst->value = mathEngine::constVal{mathEngine::constantName::E};
+
+	auto div = std::make_shared<mathEngine::exprs::multiply>(); //ln(f(x))*ln(g(x))^-1
+	auto divLhsExp = std::make_shared<mathEngine::exprs::exponent>(); //ln(g(x))^-1
+	auto divLhs = std::make_shared<mathEngine::exprs::logarithm>(); //ln(g(x))
+	divLhs->base = eConst;
+	divLhs->inside = log->base;
+	divLhsExp->exp = minusOneConst;
+	divLhsExp->base = divLhs;
+
+	auto divRhs = std::make_shared<mathEngine::exprs::logarithm>(); //ln(f(x))
+	divRhs->base = eConst;
+	divRhs->inside = log->inside;
+
+	div->terms = {divRhs, divLhsExp};
+
+	auto output = std::make_shared<mathEngine::exprs::derivative>();
+	output->expression = div;
+	output->wrtVar = wrtVar;
+
+	return output;
 }
 
 std::optional<std::shared_ptr<mathEngine::expr>> getDerivativeOf(std::shared_ptr<mathEngine::exprs::multiply> mul, std::string_view wrtVar){
+	//f'g + g'f but repeated until done
 	if(mul->terms.size() == 1)
 		return mathEngine::simplification::evaluateDerivative(mul->terms.front(), wrtVar);
 
@@ -113,6 +202,8 @@ std::optional<std::shared_ptr<mathEngine::expr>> mathEngine::simplification::eva
 		return getDerivativeOf(std::dynamic_pointer_cast<exprs::sine>(der), wrtVar);
 	}else if(isSubclass<exprs::cosine>(der)){
 		return getDerivativeOf(std::dynamic_pointer_cast<exprs::cosine>(der), wrtVar);
+	}else if(isSubclass<exprs::logarithm>(der)){
+		return getDerivativeOf(std::dynamic_pointer_cast<exprs::logarithm>(der), wrtVar);
 	}
 	return std::nullopt;
 }

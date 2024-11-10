@@ -4,6 +4,7 @@ OBJS	= mathEngine/constVal.cpp.o \
 	  mathEngine/exprs/add.cpp.o \
 	  mathEngine/exprs/constant.cpp.o \
 	  mathEngine/exprs/exponent.cpp.o \
+	  mathEngine/exprs/logarithm.cpp.o \
 	  mathEngine/exprs/multiply.cpp.o \
 	  mathEngine/exprs/variable.cpp.o \
 	  mathEngine/exprs/derivative.cpp.o \
@@ -25,6 +26,7 @@ OBJS	= mathEngine/constVal.cpp.o \
 	  parser/ptParse/parseExpression.cpp.o \
 	  parser/ptParse/parseAdd.cpp.o \
 	  parser/ptParse/parseMul.cpp.o \
+	  parser/ptParse/parseExp.cpp.o \
 	  parser/ptParse/parseConst.cpp.o \
 	  parser/ptParse/parseDerivative.cpp.o \
 	  parser/ptParse/parseTrig.cpp.o

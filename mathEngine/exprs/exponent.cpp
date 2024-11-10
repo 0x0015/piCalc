@@ -21,10 +21,10 @@ void mathEngine::exprs::exponent::propegateDFS_replace_internal(const expr::DFS_
 	else
 		base->propegateDFS_replace_internal(func);
 
-	if(base_res)
-		base = *base_res;
+	if(exp_res)
+		exp = *exp_res;
 	else
-		base->propegateDFS_replace_internal(func);
+		exp->propegateDFS_replace_internal(func);
 }
 
 std::shared_ptr<mathEngine::expr> mathEngine::exprs::exponent::propegateDFS_replace(const expr::DFS_replacement_functype& func){

@@ -7,4 +7,5 @@
 
 namespace parser{
 	parseRes<std::shared_ptr<mathEngine::exprs::add>> parseAdd(std::span<const mediumToken> tokens, expressionTypeToSkip skip = None);
+	parseRes<std::shared_ptr<mathEngine::exprs::add>> parseSub(std::span<const mediumToken> tokens, expressionTypeToSkip skip = None);
 }
