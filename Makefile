@@ -10,6 +10,7 @@ OBJS	= mathEngine/constVal.cpp.o \
 	  mathEngine/exprs/derivative.cpp.o \
 	  mathEngine/exprs/sine.cpp.o \
 	  mathEngine/exprs/cosine.cpp.o \
+	  mathEngine/exprs/absoluteValue.cpp.o \
 	  mathEngine/simplify.cpp.o \
 	  mathEngine/simplifications/reduceRationals.cpp.o \
 	  mathEngine/simplifications/mergeCommutativeOperators.cpp.o \
@@ -29,7 +30,8 @@ OBJS	= mathEngine/constVal.cpp.o \
 	  parser/ptParse/parseExp.cpp.o \
 	  parser/ptParse/parseConst.cpp.o \
 	  parser/ptParse/parseDerivative.cpp.o \
-	  parser/ptParse/parseTrig.cpp.o
+	  parser/ptParse/parseTrig.cpp.o \
+	  parser/ptParse/parseAbs.cpp.o
 
 
 OUT	= main

@@ -5,6 +5,7 @@
 #include "parseDerivative.hpp"
 #include "parseTrig.hpp"
 #include "parseExp.hpp"
+#include "parseAbs.hpp"
 #include "../../mathEngine/exprs/variable.hpp"
 
 //don't know where else to put this
@@ -59,6 +60,9 @@ parser::parseRes<std::shared_ptr<mathEngine::expr>> parser::parseExpression(std:
 	const auto& ln = parseLn(tokens);
 	if(ln)
 		return makeParseRes<rt>(ln->val, ln->toksConsumed);
+	const auto& abs = parseAbs(tokens);
+	if(abs)
+		return makeParseRes<rt>(abs->val, abs->toksConsumed);
 	const auto& parens = parseParens(tokens);
 	if(parens)
 		return makeParseRes(parens->val, parens->toksConsumed);

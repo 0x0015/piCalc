@@ -4,9 +4,9 @@
 
 namespace mathEngine{
 	namespace exprs{
-		class logarithm : public expr{
+		class absoluteValue : public expr{
 			public:
-				std::shared_ptr<expr> base, inside;
+				std::shared_ptr<expr> inside;
 				double evalDouble() const override;
 				void propegateDFS(const std::function<void(std::shared_ptr<expr>)>& func) override;
 				std::shared_ptr<expr> propegateDFS_replace(const expr::DFS_replacement_functype& func) override;
@@ -16,7 +16,6 @@ namespace mathEngine{
 				std::size_t hash() const override;
 				std::string getTypeString() const override;
 				std::string toCode(const std::unordered_set<std::string>& wrtVars) const override;
-				static inline std::string naturalLogCodeFuncName = "log";
 		};
 	}
 }

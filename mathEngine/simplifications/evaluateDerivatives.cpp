@@ -8,6 +8,7 @@
 #include "../exprs/sine.hpp"
 #include "../exprs/cosine.hpp"
 #include "../exprs/logarithm.hpp"
+#include "../exprs/absoluteValue.hpp"
 
 std::optional<std::shared_ptr<mathEngine::expr>> getDerivativeOf(std::shared_ptr<mathEngine::exprs::add> add, std::string_view wrtVar){
 	auto output = std::make_shared<mathEngine::exprs::add>();
@@ -173,6 +174,22 @@ std::optional<std::shared_ptr<mathEngine::expr>> getDerivativeOf(std::shared_ptr
 	return output;
 }
 
+std::optional<std::shared_ptr<mathEngine::expr>> getDerivativeOf(std::shared_ptr<mathEngine::exprs::absoluteValue> abs, std::string_view wrtVar){
+	//|f(x)| = |f(x)|/f(x) * Dx f(x)
+	auto minus1Const = std::make_shared<mathEngine::exprs::constant>();
+	minus1Const->value = mathEngine::constVal{rational{-1, 1}};
+	auto output = std::make_shared<mathEngine::exprs::multiply>();
+	auto term1 = abs->clone();//cloning neccesary?  investigate maybe
+	auto term2 = std::make_shared<mathEngine::exprs::exponent>();
+	term2->base = abs->inside->clone();
+	term2->exp = minus1Const;
+	auto term3 = std::make_shared<mathEngine::exprs::derivative>();
+	term3->wrtVar = wrtVar;
+	term3->expression = abs->inside;
+	output->terms = {term1, term2, term3};
+	return output;
+}
+
 std::optional<std::shared_ptr<mathEngine::expr>> getDerivativeOf(std::shared_ptr<mathEngine::exprs::variable> var, std::string_view wrtVar){
 	auto output = std::make_shared<mathEngine::exprs::constant>();
 	if(var->name == wrtVar)
@@ -204,6 +221,8 @@ std::optional<std::shared_ptr<mathEngine::expr>> mathEngine::simplification::eva
 		return getDerivativeOf(std::dynamic_pointer_cast<exprs::cosine>(der), wrtVar);
 	}else if(isSubclass<exprs::logarithm>(der)){
 		return getDerivativeOf(std::dynamic_pointer_cast<exprs::logarithm>(der), wrtVar);
+	}else if(isSubclass<exprs::absoluteValue>(der)){
+		return getDerivativeOf(std::dynamic_pointer_cast<exprs::absoluteValue>(der), wrtVar);
 	}
 	return std::nullopt;
 }

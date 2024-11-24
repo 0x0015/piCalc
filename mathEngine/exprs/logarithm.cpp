@@ -50,10 +50,10 @@ std::string mathEngine::exprs::logarithm::toCode(const std::unordered_set<std::s
 	if(dynamic_cast<constant*>(base.get()) != nullptr){
 		const auto& baseConst = std::dynamic_pointer_cast<constant>(base);
 		if(std::holds_alternative<constantName>(baseConst->value.value) && std::get<constantName>(baseConst->value.value) == constantName::E){
-			return "log(" + inside->toLatex() + ")";
+			return naturalLogCodeFuncName + "(" + inside->toLatex() + ")";
 		}
 	}
-	return "(log(" + inside->toLatex() + ")/log(" + base->toLatex() + "))";
+	return "(" + naturalLogCodeFuncName + "(" + inside->toLatex() + ")/" + naturalLogCodeFuncName + "(" + base->toCode(wrtVars) + "))";
 }
 
 std::shared_ptr<mathEngine::expr> mathEngine::exprs::logarithm::clone() const{

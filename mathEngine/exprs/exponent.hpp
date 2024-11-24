@@ -16,6 +16,7 @@ namespace mathEngine{
 				std::size_t hash() const override;
 				std::string getTypeString() const override;
 				std::string toCode(const std::unordered_set<std::string>& wrtVars) const override;
+				static inline std::string exponentCodeFuncName = "pow";
 		};
 	}
 }

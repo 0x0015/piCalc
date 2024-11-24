@@ -40,7 +40,7 @@ std::string mathEngine::exprs::exponent::toLatex() const{
 }
 
 std::string mathEngine::exprs::exponent::toCode(const std::unordered_set<std::string>& wrtVars) const{
-	return "pow(" + base->toCode(wrtVars) + ", " + exp->toCode(wrtVars) + ")";
+	return exponentCodeFuncName + "(" + base->toCode(wrtVars) + ", " + exp->toCode(wrtVars) + ")";
 }
 
 std::shared_ptr<mathEngine::expr> mathEngine::exprs::exponent::clone() const{
