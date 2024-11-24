@@ -7,8 +7,8 @@
 
 class rational{
 public:
-	int num;
-	int denom;
+	int64_t num;
+	int64_t denom;
 	constexpr rational(int p = 1, int q = 1) : num(p), denom(q) {
 		reduce();
 	}

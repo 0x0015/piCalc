@@ -51,10 +51,10 @@ static: $(OBJS)
 	$(AR) rvs $(STATIC_OUT) $(OBJS)
 
 %.cpp.o: %.cpp
-	$(CC_ACCEL) $(CXX) $< $(BUILD_CXX_FLAGS) -g -c -o $@
+	$(CC_ACCEL) $(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@
 
 %.c.o: %.c
-	$(CC_ACCEL) $(CXX) $< $(BUILD_CXX_FLAGS) -g -c -o $@
+	$(CC_ACCEL) $(CXX) $< $(BUILD_CXX_FLAGS) -c -o $@
 
 clean:
 	rm -f $(OBJS) $(OUT) $(STATIC_OUT) main.cpp.o
