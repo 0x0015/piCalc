@@ -8,6 +8,7 @@ OBJS	= mathEngine/constVal.cpp.o \
 	  mathEngine/exprs/multiply.cpp.o \
 	  mathEngine/exprs/variable.cpp.o \
 	  mathEngine/exprs/derivative.cpp.o \
+	  mathEngine/exprs/integral.cpp.o \
 	  mathEngine/exprs/sine.cpp.o \
 	  mathEngine/exprs/cosine.cpp.o \
 	  mathEngine/exprs/absoluteValue.cpp.o \
@@ -17,6 +18,7 @@ OBJS	= mathEngine/constVal.cpp.o \
 	  mathEngine/simplifications/reduceBasicArithmatic.cpp.o \
 	  mathEngine/simplifications/reduceSingleTermOps.cpp.o \
 	  mathEngine/simplifications/evaluateDerivatives.cpp.o \
+	  mathEngine/simplifications/evaluateIntegrals.cpp.o \
 	  mathEngine/simplifications/reduceTrig.cpp.o \
 	  parser/parseUtil.cpp.o \
 	  parser/tokenize/basicTokenize.cpp.o \
@@ -30,6 +32,7 @@ OBJS	= mathEngine/constVal.cpp.o \
 	  parser/ptParse/parseExp.cpp.o \
 	  parser/ptParse/parseConst.cpp.o \
 	  parser/ptParse/parseDerivative.cpp.o \
+	  parser/ptParse/parseIntegral.cpp.o \
 	  parser/ptParse/parseTrig.cpp.o \
 	  parser/ptParse/parseAbs.cpp.o
 

@@ -10,13 +10,20 @@
 #include "../exprs/logarithm.hpp"
 #include "../exprs/absoluteValue.hpp"
 
+std::shared_ptr<mathEngine::exprs::derivative> quickConstructDerivative(std::shared_ptr<mathEngine::expr> exp, std::string_view wrtVar){
+	auto output = std::make_shared<mathEngine::exprs::derivative>();
+	output->wrtVar = wrtVar;
+	output->expression = exp;
+	return output;
+};
+
 std::optional<std::shared_ptr<mathEngine::expr>> getDerivativeOf(std::shared_ptr<mathEngine::exprs::add> add, std::string_view wrtVar){
+	if(add->terms.size() == 1)
+		return mathEngine::simplification::evaluateDerivative(add->terms.front(), wrtVar);
+
 	auto output = std::make_shared<mathEngine::exprs::add>();
 	for(const auto& term : add->terms){
-		auto termDiff = mathEngine::simplification::evaluateDerivative(term, wrtVar);
-		if(!termDiff)
-			return std::nullopt;
-		output->terms.push_back(*termDiff);
+		output->terms.push_back(quickConstructDerivative(term, wrtVar));
 	}
 	return output;
 }
