@@ -110,6 +110,13 @@ std::optional<std::shared_ptr<mathEngine::expr>> getIntegralOf(std::shared_ptr<m
 	}
 }
 
+std::optional<std::shared_ptr<mathEngine::expr>> getIntegralOf(std::shared_ptr<mathEngine::exprs::derivative> der, std::string_view wrtVar){
+	if(der->wrtVar == wrtVar){
+		return der->expression;
+	}
+	return std::nullopt;
+}
+
 std::optional<std::shared_ptr<mathEngine::expr>> mathEngine::simplification::evaluateIntegral(std::shared_ptr<expr> der, std::string_view wrtVar){
 	//not the most elegant, but I didn't want to put more baggage on the expr definitions themselves
 	if(isSubclass<exprs::add>(der)){
@@ -130,6 +137,8 @@ std::optional<std::shared_ptr<mathEngine::expr>> mathEngine::simplification::eva
 		return getIntegralOf(std::dynamic_pointer_cast<exprs::logarithm>(der), wrtVar);
 	}else if(isSubclass<exprs::absoluteValue>(der)){
 		return getIntegralOf(std::dynamic_pointer_cast<exprs::absoluteValue>(der), wrtVar);
+	}else if(isSubclass<exprs::derivative>(der)){
+		return getIntegralOf(std::dynamic_pointer_cast<exprs::derivative>(der), wrtVar);
 	}
 	return std::nullopt;
 }

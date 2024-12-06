@@ -1,0 +1,3 @@
+int_x(cos(x)) -> sin(x)
+int_x(sin(x)) -> -1 * cos(x)
+

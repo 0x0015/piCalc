@@ -20,6 +20,7 @@ OBJS	= mathEngine/constVal.cpp.o \
 	  mathEngine/simplifications/evaluateDerivatives.cpp.o \
 	  mathEngine/simplifications/evaluateIntegrals.cpp.o \
 	  mathEngine/simplifications/reduceTrig.cpp.o \
+	  mathEngine/simplifications/simplificationDatabase.cpp.o \
 	  parser/parseUtil.cpp.o \
 	  parser/tokenize/basicTokenize.cpp.o \
 	  parser/tokenize/mediumTokenize.cpp.o \

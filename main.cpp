@@ -4,6 +4,7 @@
 #include "mathEngine/simplify.hpp"
 #include "mathEngine/exprs/variable.hpp"
 #include "parser/ptParse/parseConst.hpp"
+#include "mathEngine/simplifications/simplificationDatabase.hpp"
 
 int main(int argc, char** argv){
 	std::string input;
@@ -27,6 +28,7 @@ int main(int argc, char** argv){
 		std::cout<<"Unable to parse"<<std::endl;
 		return 1;
 	}
+	mathEngine::simplification::loadSimplificationDatabase("simplifications.txt");
 	if(std::holds_alternative<mathEngine::equation>(parsedResult->value)){
 		auto& eq = std::get<mathEngine::equation>(parsedResult->value);
 		std::cout<<"Got input equation: "<<eq.toLatex()<<std::endl;

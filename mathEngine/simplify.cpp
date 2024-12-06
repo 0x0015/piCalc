@@ -6,6 +6,7 @@
 #include "simplifications/evaluateDerivatives.hpp"
 #include "simplifications/evaluateIntegrals.hpp"
 #include "simplifications/reduceTrig.hpp"
+#include "simplifications/simplificationDatabase.hpp"
 #include "../mathEngine/expr.hpp"
 
 template<auto fn> std::shared_ptr<mathEngine::expr> applyUntilStabilization(std::shared_ptr<mathEngine::expr> exp){
@@ -37,7 +38,8 @@ std::shared_ptr<mathEngine::expr> mathEngine::simplify(std::shared_ptr<expr> exp
 		      | applyUntilStabilization<simplification::reduceSingleTermOps>
 		      | applyUntilStabilization<simplification::reduceTrig>
 		      | applyUntilStabilization<simplification::evaluateDerivatives>
-		      | applyUntilStabilization<simplification::evaluateIntegrals>;
+		      | applyUntilStabilization<simplification::evaluateIntegrals>
+		      | applyUntilStabilization<simplification::simplifyByDatabase>;
 
 	return state.value;
 }

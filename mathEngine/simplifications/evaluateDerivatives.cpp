@@ -5,6 +5,7 @@
 #include "../exprs/multiply.hpp"
 #include "../exprs/variable.hpp"
 #include "../exprs/derivative.hpp"
+#include "../exprs/integral.hpp"
 #include "../exprs/sine.hpp"
 #include "../exprs/cosine.hpp"
 #include "../exprs/logarithm.hpp"
@@ -206,6 +207,13 @@ std::optional<std::shared_ptr<mathEngine::expr>> getDerivativeOf(std::shared_ptr
 	return output;
 }
 
+std::optional<std::shared_ptr<mathEngine::expr>> getDerivativeOf(std::shared_ptr<mathEngine::exprs::integral> integral, std::string_view wrtVar){
+	if(integral->wrtVar == wrtVar){
+		return integral->expression;
+	}
+	return std::nullopt;
+}
+
 template<typename T> bool isSubclass(std::shared_ptr<mathEngine::expr> exp){
 	return dynamic_cast<T*>(exp.get()) != nullptr;
 }
@@ -230,6 +238,8 @@ std::optional<std::shared_ptr<mathEngine::expr>> mathEngine::simplification::eva
 		return getDerivativeOf(std::dynamic_pointer_cast<exprs::logarithm>(der), wrtVar);
 	}else if(isSubclass<exprs::absoluteValue>(der)){
 		return getDerivativeOf(std::dynamic_pointer_cast<exprs::absoluteValue>(der), wrtVar);
+	}else if(isSubclass<exprs::integral>(der)){
+		return getDerivativeOf(std::dynamic_pointer_cast<exprs::integral>(der), wrtVar);
 	}
 	return std::nullopt;
 }
