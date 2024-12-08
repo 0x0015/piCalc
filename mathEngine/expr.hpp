@@ -11,6 +11,7 @@ namespace mathEngine{
 	}
 	class expr : public std::enable_shared_from_this<expr>{
 		public:
+		uint32_t type = 0;
 		virtual double evalDouble() const = 0;
 		using DFS_functype = std::function<void(std::shared_ptr<expr>)>;
 		virtual void propegateDFS(const DFS_functype& func) = 0;
@@ -23,5 +24,12 @@ namespace mathEngine{
 		virtual std::string getTypeString() const = 0;
 		virtual std::string toCode(const std::unordered_set<std::string>& wrtVars) const = 0;
 		std::shared_ptr<expr> substiteVariable(const std::string& varName, std::shared_ptr<expr> subVal);
+		template<typename T> constexpr bool isInstance() const{
+			return type == T::typeID;
+		}
+		template<typename T> std::shared_ptr<T> getAs(){
+			//maybe add a check here to make sure isInstance is true first.  Not sure what we'd do about it though (sorta too late)
+			return std::static_pointer_cast<T>(shared_from_this());
+		}
 	};
 }

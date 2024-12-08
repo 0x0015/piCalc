@@ -3,6 +3,10 @@
 #include "variable.hpp"
 #include "../simplifications/evaluateIntegrals.hpp"
 
+mathEngine::exprs::integral::integral(){
+	type = typeID;
+}
+
 double mathEngine::exprs::integral::evalDouble() const{
 	return -1;
 }

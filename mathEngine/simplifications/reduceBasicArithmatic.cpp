@@ -7,14 +7,14 @@
 std::shared_ptr<mathEngine::expr> mathEngine::simplification::reduceBasicArithmatic(std::shared_ptr<expr> exp){
 	//adds
 	exp->propegateDFS([](std::shared_ptr<expr> exp){
-		if(dynamic_cast<exprs::add*>(exp.get()) != nullptr){
-			auto add = std::dynamic_pointer_cast<exprs::add>(exp);
+		if(exp->isInstance<exprs::add>()){
+			auto add = exp->getAs<exprs::add>();
 			std::optional<rational> rationalSum;
 			std::optional<double> realSum;
 			std::vector<std::shared_ptr<expr>> otherTerms;
 			for(const auto& term : add->terms){
-				if(dynamic_cast<exprs::constant*>(term.get()) != nullptr){
-					auto term_const = std::dynamic_pointer_cast<exprs::constant>(term);
+				if(term->isInstance<exprs::constant>()){
+					auto term_const = term->getAs<exprs::constant>();
 					if(std::holds_alternative<rational>(term_const->value.value)){
 						const auto& term_rat = std::get<rational>(term_const->value.value);
 						if(!rationalSum)
@@ -46,14 +46,14 @@ std::shared_ptr<mathEngine::expr> mathEngine::simplification::reduceBasicArithma
 
 	//muls
 	exp->propegateDFS([](std::shared_ptr<expr> exp){
-		if(dynamic_cast<exprs::multiply*>(exp.get()) != nullptr){
-			auto mul = std::dynamic_pointer_cast<exprs::multiply>(exp);
+		if(exp->isInstance<exprs::multiply>()){
+			auto mul = exp->getAs<exprs::multiply>();
 			std::optional<rational> rationalProduct;
 			std::optional<double> realProduct;
 			std::vector<std::shared_ptr<expr>> otherTerms;
 			for(const auto& term : mul->terms){
-				if(dynamic_cast<exprs::constant*>(term.get()) != nullptr){
-					auto term_const = std::dynamic_pointer_cast<exprs::constant>(term);
+				if(term->isInstance<exprs::constant>()){
+					auto term_const = term->getAs<exprs::constant>();
 					if(std::holds_alternative<rational>(term_const->value.value)){
 						const auto& term_rat = std::get<rational>(term_const->value.value);
 						if(!rationalProduct)
@@ -85,11 +85,11 @@ std::shared_ptr<mathEngine::expr> mathEngine::simplification::reduceBasicArithma
 
 	//multiplications by 0
 	auto retVal = exp->propegateDFS_replace([](std::shared_ptr<expr> exp)->std::optional<std::shared_ptr<expr>>{	
-		if(dynamic_cast<exprs::multiply*>(exp.get()) != nullptr){
-			auto mul = std::dynamic_pointer_cast<exprs::multiply>(exp);
+		if(exp->isInstance<exprs::multiply>()){
+			auto mul = exp->getAs<exprs::multiply>();
 			for(const auto& term : mul->terms){
-				if(dynamic_cast<exprs::constant*>(term.get()) != nullptr){	
-					auto term_const = std::dynamic_pointer_cast<exprs::constant>(term);
+				if(term->isInstance<exprs::constant>()){	
+					auto term_const = term->getAs<exprs::constant>();
 					if(std::holds_alternative<rational>(term_const->value.value)){
 						const auto& term_rat = std::get<rational>(term_const->value.value);
 						if(term_rat == rational{0, 1}){

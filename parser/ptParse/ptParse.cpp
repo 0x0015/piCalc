@@ -17,8 +17,8 @@ std::optional<parser::parseResult> parser::ptParse::parse(const std::string_view
 
 	auto registerExprVars = [&](std::shared_ptr<mathEngine::expr> expr){
 		expr->propegateDFS([&](std::shared_ptr<mathEngine::expr> expr){
-			if(dynamic_cast<mathEngine::exprs::variable*>(expr.get()) != nullptr){
-				auto var = std::dynamic_pointer_cast<mathEngine::exprs::variable>(expr);
+			if(expr->isInstance<mathEngine::exprs::variable>()){
+				auto var = expr->getAs<mathEngine::exprs::variable>();
 				res.vars.insert(var->name);
 				mathEngine::exprs::variable::varVals[var->name] = mathEngine::constVal{rational(1,1)}; //just some default value
 			}

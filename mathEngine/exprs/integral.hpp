@@ -6,6 +6,8 @@ namespace mathEngine{
 	namespace exprs{
 		class integral : public expr{
 			public:
+				constexpr static uint32_t typeID = COMPILE_TIME_CRC32_STR("integral");
+				integral();
 				std::shared_ptr<expr> expression;
 				std::string wrtVar;
 				static inline double dx = 0.001; //almost certainly egregously high

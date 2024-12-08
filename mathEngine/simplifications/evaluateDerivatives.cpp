@@ -82,8 +82,8 @@ std::optional<std::shared_ptr<mathEngine::expr>> getDerivativeOf(std::shared_ptr
 	minusOneConst->value = mathEngine::constVal{rational{-1, 1}};
 
 	//this NEEDS to be checked first, otherwise the below creates an infinite derivative expansion, as the ln derivatives don't get simplified before more are made
-	if(dynamic_cast<mathEngine::exprs::constant*>(log->base.get()) != nullptr){
-		const auto& logBaseConst = std::dynamic_pointer_cast<mathEngine::exprs::constant>(log->base);
+	if(log->base->isInstance<mathEngine::exprs::constant>()){
+		const auto& logBaseConst = log->base->getAs<mathEngine::exprs::constant>();
 		if(std::holds_alternative<mathEngine::constantName>(logBaseConst->value.value) && std::get<mathEngine::constantName>(logBaseConst->value.value) == mathEngine::constantName::E){
 			//it's a natural log!  Dx ln(f(x)) = (Dx f(x))/f(x)
 			auto output = std::make_shared<mathEngine::exprs::multiply>();
@@ -214,40 +214,37 @@ std::optional<std::shared_ptr<mathEngine::expr>> getDerivativeOf(std::shared_ptr
 	return std::nullopt;
 }
 
-template<typename T> bool isSubclass(std::shared_ptr<mathEngine::expr> exp){
-	return dynamic_cast<T*>(exp.get()) != nullptr;
-}
-
 std::optional<std::shared_ptr<mathEngine::expr>> mathEngine::simplification::evaluateDerivative(std::shared_ptr<expr> der, std::string_view wrtVar){
-	//not the most elegant, but I didn't want to put more baggage on the expr definitions themselves
-	if(isSubclass<exprs::add>(der)){
-		return getDerivativeOf(std::dynamic_pointer_cast<exprs::add>(der), wrtVar);
-	}else if(isSubclass<exprs::constant>(der)){
-		return getDerivativeOf(std::dynamic_pointer_cast<exprs::constant>(der), wrtVar);
-	}else if(isSubclass<exprs::exponent>(der)){
-		return getDerivativeOf(std::dynamic_pointer_cast<exprs::exponent>(der), wrtVar);
-	}else if(isSubclass<exprs::multiply>(der)){
-		return getDerivativeOf(std::dynamic_pointer_cast<exprs::multiply>(der), wrtVar);
-	}else if(isSubclass<exprs::variable>(der)){
-		return getDerivativeOf(std::dynamic_pointer_cast<exprs::variable>(der), wrtVar);
-	}else if(isSubclass<exprs::sine>(der)){
-		return getDerivativeOf(std::dynamic_pointer_cast<exprs::sine>(der), wrtVar);
-	}else if(isSubclass<exprs::cosine>(der)){
-		return getDerivativeOf(std::dynamic_pointer_cast<exprs::cosine>(der), wrtVar);
-	}else if(isSubclass<exprs::logarithm>(der)){
-		return getDerivativeOf(std::dynamic_pointer_cast<exprs::logarithm>(der), wrtVar);
-	}else if(isSubclass<exprs::absoluteValue>(der)){
-		return getDerivativeOf(std::dynamic_pointer_cast<exprs::absoluteValue>(der), wrtVar);
-	}else if(isSubclass<exprs::integral>(der)){
-		return getDerivativeOf(std::dynamic_pointer_cast<exprs::integral>(der), wrtVar);
+	switch(der->type){
+		case mathEngine::exprs::add::typeID:
+			return getDerivativeOf(der->getAs<exprs::add>(), wrtVar);
+		case mathEngine::exprs::constant::typeID:
+			return getDerivativeOf(der->getAs<exprs::constant>(), wrtVar);
+		case mathEngine::exprs::exponent::typeID:
+			return getDerivativeOf(der->getAs<exprs::exponent>(), wrtVar);
+		case mathEngine::exprs::multiply::typeID:
+			return getDerivativeOf(der->getAs<exprs::multiply>(), wrtVar);
+		case mathEngine::exprs::variable::typeID:
+			return getDerivativeOf(der->getAs<exprs::variable>(), wrtVar);
+		case mathEngine::exprs::sine::typeID:
+			return getDerivativeOf(der->getAs<exprs::sine>(), wrtVar);
+		case mathEngine::exprs::cosine::typeID:
+			return getDerivativeOf(der->getAs<exprs::cosine>(), wrtVar);
+		case mathEngine::exprs::logarithm::typeID:
+			return getDerivativeOf(der->getAs<exprs::logarithm>(), wrtVar);
+		case mathEngine::exprs::absoluteValue::typeID:
+			return getDerivativeOf(der->getAs<exprs::absoluteValue>(), wrtVar);
+		case mathEngine::exprs::integral::typeID:
+			return getDerivativeOf(der->getAs<exprs::integral>(), wrtVar);
+		default:
+			return std::nullopt;
 	}
-	return std::nullopt;
 }
 
 std::shared_ptr<mathEngine::expr> mathEngine::simplification::evaluateDerivatives(std::shared_ptr<expr> exp){
 	auto retVal = exp->propegateDFS_replace([](std::shared_ptr<expr> exp)->std::optional<std::shared_ptr<expr>>{
-		if(dynamic_cast<exprs::derivative*>(exp.get()) != nullptr){
-			auto der = std::dynamic_pointer_cast<exprs::derivative>(exp);
+		if(exp->isInstance<exprs::derivative>()){
+			auto der = exp->getAs<exprs::derivative>();
 			auto evaluated = evaluateDerivative(der->expression, der->wrtVar);
 			if(evaluated){
 				return *evaluated;

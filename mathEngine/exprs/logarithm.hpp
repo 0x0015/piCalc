@@ -6,6 +6,8 @@ namespace mathEngine{
 	namespace exprs{
 		class logarithm : public expr{
 			public:
+				constexpr static uint32_t typeID = COMPILE_TIME_CRC32_STR("logarithm");
+				logarithm();
 				std::shared_ptr<expr> base, inside;
 				double evalDouble() const override;
 				void propegateDFS(const std::function<void(std::shared_ptr<expr>)>& func) override;

@@ -2,6 +2,10 @@
 #include <cmath>
 #include "../hashCombine.hpp"
 
+mathEngine::exprs::sine::sine(){
+	type = typeID;
+}
+
 double mathEngine::exprs::sine::evalDouble() const{
 	return std::sin(inside->evalDouble());
 }

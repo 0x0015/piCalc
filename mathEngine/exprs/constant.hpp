@@ -7,6 +7,8 @@ namespace mathEngine{
 	namespace exprs{
 		class constant : public expr{
 			public:
+				const static uint32_t typeID = COMPILE_TIME_CRC32_STR("constant");
+				constant();
 				constVal value;
 				double evalDouble() const override;
 				void propegateDFS(const std::function<void(std::shared_ptr<expr>)>& func) override;

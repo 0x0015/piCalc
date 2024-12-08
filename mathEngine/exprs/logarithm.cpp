@@ -3,6 +3,10 @@
 #include "../hashCombine.hpp"
 #include "constant.hpp"
 
+mathEngine::exprs::logarithm::logarithm(){
+	type = typeID;
+}
+
 double mathEngine::exprs::logarithm::evalDouble() const{
 	return std::log(inside->evalDouble()) / std::log(base->evalDouble()); //log base change.  We'll be using this a bit
 }
@@ -37,8 +41,8 @@ std::shared_ptr<mathEngine::expr> mathEngine::exprs::logarithm::propegateDFS_rep
 }
 
 std::string mathEngine::exprs::logarithm::toLatex() const{
-	if(dynamic_cast<constant*>(base.get()) != nullptr){
-		const auto& baseConst = std::dynamic_pointer_cast<constant>(base);
+	if(base->isInstance<constant>()){
+		const auto& baseConst = base->getAs<constant>();
 		if(std::holds_alternative<constantName>(baseConst->value.value) && std::get<constantName>(baseConst->value.value) == constantName::E){
 			return "ln(" + inside->toLatex() + ")";
 		}
@@ -47,8 +51,8 @@ std::string mathEngine::exprs::logarithm::toLatex() const{
 }
 
 std::string mathEngine::exprs::logarithm::toCode(const std::unordered_set<std::string>& wrtVars) const{
-	if(dynamic_cast<constant*>(base.get()) != nullptr){
-		const auto& baseConst = std::dynamic_pointer_cast<constant>(base);
+	if(base->isInstance<constant>()){
+		const auto& baseConst = base->getAs<constant>();
 		if(std::holds_alternative<constantName>(baseConst->value.value) && std::get<constantName>(baseConst->value.value) == constantName::E){
 			return naturalLogCodeFuncName + "(" + inside->toCode(wrtVars) + ")";
 		}

@@ -73,13 +73,13 @@ const std::unordered_map<rational, std::pair<std::shared_ptr<mathEngine::expr>, 
 const std::unordered_map<rational, std::pair<std::shared_ptr<mathEngine::expr>, std::shared_ptr<mathEngine::expr>>> unitCircleValues{constructUnitCirclesValueList()};
 
 std::optional<std::pair<std::shared_ptr<mathEngine::expr>, std::shared_ptr<mathEngine::expr>>> mathEngine::simplification::getTrigVals(std::shared_ptr<expr> exp){
-	if(dynamic_cast<const exprs::multiply*>(exp.get()) != nullptr){
-		const auto& cE_mul = std::dynamic_pointer_cast<const exprs::multiply>(exp);
+	if(exp->isInstance<exprs::multiply>()){
+		const auto& cE_mul = exp->getAs<exprs::multiply>();
 		//check if there are two terms which are exactly a rational, and pi -> a rational multiple of pi -> simplifiable
 		if(cE_mul->terms.size() == 2){
-			if(dynamic_cast<const exprs::constant*>(cE_mul->terms[0].get()) != nullptr && dynamic_cast<const exprs::constant*>(cE_mul->terms[1].get()) != nullptr){
-				const auto& piTerm = std::dynamic_pointer_cast<const exprs::constant>(cE_mul->terms[0]);
-				const auto& rationalTerm = std::dynamic_pointer_cast<const exprs::constant>(cE_mul->terms[1]);
+			if(cE_mul->terms[0]->isInstance<exprs::constant>() && cE_mul->terms[1]->isInstance<exprs::constant>()){
+				const auto& piTerm = cE_mul->terms[0]->getAs<exprs::constant>();
+				const auto& rationalTerm = cE_mul->terms[1]->getAs<exprs::constant>();
 				if(std::holds_alternative<constantName>(piTerm->value.value) && std::holds_alternative<rational>(rationalTerm->value.value)){
 					const auto& rationalTerm_rat = std::get<rational>(rationalTerm->value.value);
 					const auto& piTerm_name = std::get<constantName>(piTerm->value.value);
@@ -90,8 +90,8 @@ std::optional<std::pair<std::shared_ptr<mathEngine::expr>, std::shared_ptr<mathE
 			}
 		}
 	}
-	if(dynamic_cast<exprs::constant*>(exp.get()) != nullptr){
-		const auto& constExp = std::dynamic_pointer_cast<exprs::constant>(exp);
+	if(exp->isInstance<exprs::constant>()){
+		const auto& constExp = exp->getAs<exprs::constant>();
 		if(std::holds_alternative<constantName>(constExp->value.value)){
 			const auto& constname = std::get<constantName>(constExp->value.value);
 			if(constname == constantName::PI){
@@ -112,15 +112,15 @@ std::optional<std::pair<std::shared_ptr<mathEngine::expr>, std::shared_ptr<mathE
 
 std::shared_ptr<mathEngine::expr> mathEngine::simplification::reduceTrig(std::shared_ptr<expr> exp){
 	auto retVal = exp->propegateDFS_replace([](std::shared_ptr<expr> exp)->std::optional<std::shared_ptr<expr>>{
-		if(dynamic_cast<exprs::sine*>(exp.get()) != nullptr){
-			auto der = std::dynamic_pointer_cast<exprs::sine>(exp);
+		if(exp->isInstance<exprs::sine>()){
+			auto der = exp->getAs<exprs::sine>();
 			const auto& evaluated = getTrigVals(der->inside);
 			if(evaluated){
 				return evaluated->second;
 			}
 		}
-		if(dynamic_cast<exprs::cosine*>(exp.get()) != nullptr){
-			auto der = std::dynamic_pointer_cast<exprs::cosine>(exp);
+		if(exp->isInstance<exprs::cosine>()){
+			auto der = exp->getAs<exprs::cosine>();
 			const auto& evaluated = getTrigVals(der->inside);
 			if(evaluated){
 				return evaluated->first;

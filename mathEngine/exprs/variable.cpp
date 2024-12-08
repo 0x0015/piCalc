@@ -1,6 +1,10 @@
 #include "variable.hpp"
 #include "../hashCombine.hpp"
 
+mathEngine::exprs::variable::variable(){
+	type = typeID;
+}
+
 double mathEngine::exprs::variable::evalDouble() const{
 	return varVals[name].toDouble();
 }

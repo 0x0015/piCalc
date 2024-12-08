@@ -7,6 +7,8 @@ namespace mathEngine{
 	namespace exprs{
 		class multiply : public expr{
 			public:
+				constexpr static uint32_t typeID = COMPILE_TIME_CRC32_STR("multiply");
+				multiply();
 				std::vector<std::shared_ptr<expr>> terms;
 				double evalDouble() const override;
 				void propegateDFS(const std::function<void(std::shared_ptr<expr>)>& func) override;

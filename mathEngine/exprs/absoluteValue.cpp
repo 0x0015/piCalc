@@ -2,6 +2,10 @@
 #include <cmath>
 #include "../hashCombine.hpp"
 
+mathEngine::exprs::absoluteValue::absoluteValue(){
+	type = typeID;
+}
+
 double mathEngine::exprs::absoluteValue::evalDouble() const{
 	return std::abs(inside->evalDouble());
 }

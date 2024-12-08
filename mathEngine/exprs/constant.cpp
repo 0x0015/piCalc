@@ -4,6 +4,9 @@
 #include "multiply.hpp"
 #include "../hashCombine.hpp"
 
+mathEngine::exprs::constant::constant(){
+	type = typeID;
+}
 double mathEngine::exprs::constant::evalDouble() const{
 	return value.toDouble();
 }

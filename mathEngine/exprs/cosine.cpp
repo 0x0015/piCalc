@@ -2,6 +2,10 @@
 #include <cmath>
 #include "../hashCombine.hpp"
 
+mathEngine::exprs::cosine::cosine(){
+	type = typeID;
+}
+
 double mathEngine::exprs::cosine::evalDouble() const{
 	return std::cos(inside->evalDouble());
 }

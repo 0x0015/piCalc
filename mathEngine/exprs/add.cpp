@@ -1,6 +1,10 @@
 #include "add.hpp"
 #include "../hashCombine.hpp"
 
+mathEngine::exprs::add::add(){
+	type = typeID;
+}
+
 double mathEngine::exprs::add::evalDouble() const{
 	if(terms.empty())
 		return -1;

@@ -1,6 +1,10 @@
 #include "multiply.hpp"
 #include "../hashCombine.hpp"
 
+mathEngine::exprs::multiply::multiply(){
+	type = typeID;
+}
+
 double mathEngine::exprs::multiply::evalDouble() const{
 	if(terms.empty())
 		return -1;

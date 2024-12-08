@@ -7,6 +7,8 @@ namespace mathEngine{
 	namespace exprs{
 		class variable : public expr{
 			public:
+				constexpr static uint32_t typeID = COMPILE_TIME_CRC32_STR("variable");
+				variable();
 				static inline std::unordered_map<std::string, constVal> varVals;
 				std::string name;
 				double evalDouble() const override;

@@ -6,6 +6,8 @@ namespace mathEngine{
 	namespace exprs{
 		class exponent : public expr{
 			public:
+				constexpr static uint32_t typeID = COMPILE_TIME_CRC32_STR("exponent");
+				exponent();
 				std::shared_ptr<expr> base, exp;
 				double evalDouble() const override;
 				void propegateDFS(const std::function<void(std::shared_ptr<expr>)>& func) override;

@@ -3,6 +3,10 @@
 #include "variable.hpp"
 #include "../simplifications/evaluateDerivatives.hpp"
 
+mathEngine::exprs::derivative::derivative(){
+	type = typeID;
+}
+
 //note: see the section on step size at https://en.wikipedia.org/wiki/Numerical_differentiation
 double mathEngine::exprs::derivative::evalDouble() const{
 	auto oldVal = variable::varVals[wrtVar];

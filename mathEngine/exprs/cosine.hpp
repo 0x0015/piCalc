@@ -6,6 +6,8 @@ namespace mathEngine{
 	namespace exprs{
 		class cosine : public expr{
 			public:
+				constexpr static uint32_t typeID = COMPILE_TIME_CRC32_STR("cosine");
+				cosine();
 				std::shared_ptr<expr> inside;
 				double evalDouble() const override;
 				void propegateDFS(const std::function<void(std::shared_ptr<expr>)>& func) override;

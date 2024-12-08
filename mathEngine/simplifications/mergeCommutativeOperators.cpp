@@ -7,12 +7,12 @@
 std::shared_ptr<mathEngine::expr> mathEngine::simplification::mergeCommutativeOperators(std::shared_ptr<expr> exp){
 	//adds
 	exp->propegateDFS([](std::shared_ptr<expr> exp){
-		if(dynamic_cast<exprs::add*>(exp.get()) != nullptr){
-			auto add = std::dynamic_pointer_cast<exprs::add>(exp);
+		if(exp->isInstance<exprs::add>()){
+			auto add = exp->getAs<exprs::add>();
 			std::vector<std::shared_ptr<expr>> newTerms;
 			for(const auto& term : add->terms){
-				if(dynamic_cast<exprs::add*>(term.get()) != nullptr){
-					auto term_add = std::dynamic_pointer_cast<exprs::add>(term);
+				if(term->isInstance<exprs::add>()){
+					auto term_add = term->getAs<exprs::add>();
 					for(const auto& subterm : term_add->terms)
 						newTerms.push_back(subterm);
 				}else
@@ -24,12 +24,12 @@ std::shared_ptr<mathEngine::expr> mathEngine::simplification::mergeCommutativeOp
 
 	//muls
 	exp->propegateDFS([](std::shared_ptr<expr> exp){
-		if(dynamic_cast<exprs::multiply*>(exp.get()) != nullptr){
-			auto mult = std::dynamic_pointer_cast<exprs::multiply>(exp);
+		if(exp->isInstance<exprs::multiply>()){
+			auto mult = exp->getAs<exprs::multiply>();
 			std::vector<std::shared_ptr<expr>> newTerms;
 			for(const auto& term : mult->terms){
-				if(dynamic_cast<exprs::multiply*>(term.get()) != nullptr){
-					auto term_mul = std::dynamic_pointer_cast<exprs::multiply>(term);
+				if(term->isInstance<exprs::multiply>()){
+					auto term_mul = term->getAs<exprs::multiply>();
 					for(const auto& subterm : term_mul->terms)
 						newTerms.push_back(subterm);
 				}else

@@ -2,6 +2,10 @@
 #include <cmath>
 #include "../hashCombine.hpp"
 
+mathEngine::exprs::exponent::exponent(){
+	type = typeID;
+}
+
 double mathEngine::exprs::exponent::evalDouble() const{
 	return std::pow(base->evalDouble(), exp->evalDouble());
 }
