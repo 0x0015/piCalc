@@ -1,2 +1,2 @@
-int_x(cos(x)) -> sin(x)
-int_x(sin(x)) -> -1 * cos(x)
+var x, const a: int_x(cos(a*x)) -> (1/a) * sin(x)
+var x, const a: int_x(sin(a*x)) -> (-1/a) * cos(x)

@@ -8,7 +8,7 @@ parser::parseRes<std::shared_ptr<mathEngine::exprs::multiply>> parser::parseMul(
 		return std::nullopt;
 
 	unsigned int usedTokens = 0;
-	const auto& lhs = parseExpression(tokens, (expressionTypeToSkip) (expressionTypeToSkip::Mul | skip));
+	const auto& lhs = parseSimpleExpression(tokens);
 	if(!lhs)
 		return std::nullopt;
 	usedTokens += lhs->toksConsumed;
@@ -38,7 +38,7 @@ parser::parseRes<std::shared_ptr<mathEngine::exprs::multiply>> parser::parseDiv(
 		return std::nullopt;
 
 	unsigned int usedTokens = 0;
-	const auto& lhs = parseExpression(tokens, (expressionTypeToSkip) (expressionTypeToSkip::Div | skip));
+	const auto& lhs = parseSimpleExpression(tokens);
 	if(!lhs)
 		return std::nullopt;
 	usedTokens += lhs->toksConsumed;

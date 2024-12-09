@@ -15,4 +15,5 @@ namespace parser{
 	};
 	parseRes<std::shared_ptr<mathEngine::expr>> parseParens(std::span<const parser::mediumToken> tokens);
 	parseRes<std::shared_ptr<mathEngine::expr>> parseExpression(std::span<const mediumToken> tokens, expressionTypeToSkip skip = None);
+	parseRes<std::shared_ptr<mathEngine::expr>> parseSimpleExpression(std::span<const mediumToken> tokens);
 }
