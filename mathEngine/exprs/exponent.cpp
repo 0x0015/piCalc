@@ -55,12 +55,28 @@ std::shared_ptr<mathEngine::expr> mathEngine::exprs::exponent::clone() const{
 }
 
 std::size_t mathEngine::exprs::exponent::hash() const{
-	std::size_t lhsHash = base->hash();
-	mathEngine::hash_combine(lhsHash, exp->hash(), COMPILE_TIME_CRC32_STR("exponent"));
-	return lhsHash;
+	return mathEngine::hashValues(base->hash(), exp->hash(), typeID);
+}
+
+std::size_t mathEngine::exprs::exponent::hashTypeSig(bool allConstSame, std::optional<std::string_view> constWrtVar) const{
+	if(allConstSame && isConst(constWrtVar)){
+		return COMPILE_TIME_CRC32_STR("constantExpression");
+	}else{
+		return mathEngine::hashValues(typeID, base->hashTypeSig(allConstSame, constWrtVar), exp->hashTypeSig(allConstSame, constWrtVar));
+	}
 }
 
 std::string mathEngine::exprs::exponent::getTypeString() const{
 	return "(" + base->getTypeString() + ")^(" + exp->getTypeString() + ")";
 }
 
+bool mathEngine::exprs::exponent::isConst(std::optional<std::string_view> wrtVar) const{
+	return base->isConst(wrtVar) && exp->isConst(wrtVar);
+}
+
+bool mathEngine::exprs::exponent::isEqual(const expr* other) const{
+	if(type != other->type)
+		return false;
+	const auto& otherExp = other->getAs<const exponent>();
+	return base->isEqual(otherExp->base.get()) && exp->isEqual(otherExp->exp.get());
+}

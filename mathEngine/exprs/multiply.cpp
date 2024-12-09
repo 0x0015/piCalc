@@ -66,10 +66,15 @@ std::shared_ptr<mathEngine::expr> mathEngine::exprs::multiply::clone() const{
 }
 
 std::size_t mathEngine::exprs::multiply::hash() const{
-	std::size_t outputHash = COMPILE_TIME_CRC32_STR("add");
-	for(const auto& term : terms)
-		mathEngine::hash_combine(outputHash, term->hash());
-	return outputHash;
+	return hashValuesOrderInvarientAccessor([&](unsigned int i){return terms[i]->hash();}, terms.size(), typeID);
+}
+
+std::size_t mathEngine::exprs::multiply::hashTypeSig(bool allConstSame, std::optional<std::string_view> constWrtVar) const{
+	if(allConstSame && isConst(constWrtVar)){
+		return COMPILE_TIME_CRC32_STR("constantExpression");
+	}else{
+		return hashValuesOrderInvarientAccessor([&](unsigned int i){return terms[i]->hashTypeSig(allConstSame, constWrtVar);}, terms.size(), typeID);
+	}
 }
 
 std::string mathEngine::exprs::multiply::getTypeString() const{
@@ -81,4 +86,35 @@ std::string mathEngine::exprs::multiply::getTypeString() const{
 	}
 	output += ')';
 	return output;
+}
+
+bool mathEngine::exprs::multiply::isConst(std::optional<std::string_view> wrtVar) const{
+	for(const auto& term : terms){
+		if(!term->isConst(wrtVar))
+			return false;
+	}
+	return true;
+}
+
+bool mathEngine::exprs::multiply::isEqual(const expr* other) const{
+	if(type != other->type)
+		return false;
+	const auto& otherMul = other->getAs<const multiply>();
+	if(otherMul->terms.size() != terms.size())
+		return false;
+	if(hash() != other->hash())
+		return false;
+	std::vector<std::shared_ptr<expr>> outstandingTerms = terms;
+	std::vector<std::shared_ptr<expr>> outstandingOtherTerms = otherMul->terms;
+	//very slow matching(to preserve commutivity).  Make sure it's actually true, but have many MANY failure points above
+	std::erase_if(outstandingTerms, [&](const std::shared_ptr<expr> term){
+		for(unsigned int i=0;i<outstandingOtherTerms.size();i++){
+			if(term->isEqual(outstandingOtherTerms[i].get())){
+				outstandingOtherTerms.erase(outstandingOtherTerms.begin() + i);
+				return true;
+			}
+		}
+		return false;
+	});
+	return outstandingTerms.empty() && outstandingOtherTerms.empty();
 }

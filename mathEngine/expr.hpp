@@ -21,6 +21,9 @@ namespace mathEngine{
 		virtual std::string toLatex() const = 0;
 		virtual std::shared_ptr<expr> clone() const = 0;
 		virtual std::size_t hash() const = 0;
+		virtual std::size_t hashTypeSig(bool allConstSame = true, std::optional<std::string_view> constWrtVar = std::nullopt) const = 0;
+		virtual bool isConst(std::optional<std::string_view> wrtVar = std::nullopt) const = 0;
+		virtual bool isEqual(const expr* other) const = 0;
 		virtual std::string getTypeString() const = 0;
 		virtual std::string toCode(const std::unordered_set<std::string>& wrtVars) const = 0;
 		std::shared_ptr<expr> substiteVariable(const std::string& varName, std::shared_ptr<expr> subVal);
@@ -30,6 +33,10 @@ namespace mathEngine{
 		template<typename T> std::shared_ptr<T> getAs(){
 			//maybe add a check here to make sure isInstance is true first.  Not sure what we'd do about it though (sorta too late)
 			return std::static_pointer_cast<T>(shared_from_this());
+		}
+		template<typename T> std::shared_ptr<const T> getAs() const{
+			//maybe add a check here to make sure isInstance is true first.  Not sure what we'd do about it though (sorta too late)
+			return std::static_pointer_cast<const T>(shared_from_this());
 		}
 	};
 }

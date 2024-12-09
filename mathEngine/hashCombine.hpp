@@ -1,5 +1,8 @@
 #pragma once
 #include <string>
+#include <array>
+#include <algorithm>
+#include <vector>
 
 namespace mathEngine{
 	inline void hash_combine(std::size_t& seed) { }
@@ -8,6 +11,67 @@ namespace mathEngine{
 	    std::hash<T> hasher;
 	    seed ^= hasher(v) + 0x9e3779b9 + (seed<<6) + (seed>>2);
 	    hash_combine(seed, rest...);
+	}
+	template<typename T> inline std::size_t computeHash(const T& val){
+		return std::hash<T>{}(val);
+	}
+	template<> inline std::size_t computeHash<std::size_t>(const std::size_t& val){
+		return val;
+	}
+	template<typename... T> inline std::size_t hashValues(const T&... values){
+		std::array<std::size_t, sizeof...(T)> hashVals;
+		unsigned int i=0;
+		([&]{
+			hashVals[i] = computeHash(values);
+			i++;
+		}(), ...);
+		std::size_t output = hashVals[0];
+		for(unsigned int i=1;i<hashVals.size();i++){
+			hash_combine(output, hashVals[i]);
+		}
+		return output;
+	}
+	template<typename... T> inline std::size_t hashValuesOrderInvarient(const T&... values){
+		std::array<std::size_t, sizeof...(T)> hashVals;
+		unsigned int i=0;
+		([&]{
+			hashVals[i] = computeHash(values);
+			i++;
+		}(), ...);
+		std::sort(hashVals);
+		std::size_t output = hashVals[0];
+		for(unsigned int i=1;i<hashVals.size();i++){
+			hash_combine(output, hashVals[i]);
+		}
+		return output;
+	}
+	template<typename Accessor, typename T> inline std::size_t hashValuesOrderInvarientAccessor(const Accessor& accessor, unsigned int numVals, const T& extraElement){
+		if(numVals < 32){
+			std::size_t* hashVals = (std::size_t*)alloca(sizeof(std::size_t) * numVals); //little (dangerous) optimization here.
+			for(unsigned int i=0;i<numVals;i++){
+				hashVals[i] = computeHash(accessor(i));
+			}
+			std::sort(hashVals, hashVals + numVals);
+			std::size_t output = hashVals[0];
+			for(unsigned int i=1;i<numVals;i++){
+				hash_combine(output, hashVals[i]);
+			}
+			hash_combine(output, computeHash(extraElement));
+			return output;
+		}else{
+			std::size_t* hashVals = (std::size_t*)malloc(sizeof(std::size_t) * numVals);
+			for(unsigned int i=0;i<numVals;i++){
+				hashVals[i] = computeHash(accessor(i));
+			}
+			std::sort(hashVals, hashVals + numVals);
+			std::size_t output = hashVals[0];
+			for(unsigned int i=1;i<numVals;i++){
+				hash_combine(output, hashVals[i]);
+			}
+			hash_combine(output, computeHash(extraElement));
+			free(hashVals);
+			return output;
+		}
 	}
 
 	

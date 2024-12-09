@@ -42,11 +42,27 @@ std::shared_ptr<mathEngine::expr> mathEngine::exprs::variable::clone() const{
 }
 
 std::size_t mathEngine::exprs::variable::hash() const{
-	std::size_t nameHash = std::hash<std::string>{}(name);
-	mathEngine::hash_combine(nameHash, COMPILE_TIME_CRC32_STR("variable"));
-	return nameHash;
+	return mathEngine::hashValues(name, typeID);
+}
+
+std::size_t mathEngine::exprs::variable::hashTypeSig(bool allConstSame, std::optional<std::string_view> constWrtVar) const{
+	if(allConstSame && isConst(constWrtVar)){
+		return COMPILE_TIME_CRC32_STR("constantExpression");
+	}else{
+		return typeID;
+	}
 }
 
 std::string mathEngine::exprs::variable::getTypeString() const{
 	return "variable";
+}
+
+bool mathEngine::exprs::variable::isConst(std::optional<std::string_view> wrtVar) const{
+	if(wrtVar)
+		return *wrtVar != name;
+	return false;
+}
+
+bool mathEngine::exprs::variable::isEqual(const expr* other) const{
+	return type == other->type && name == other->getAs<const variable>()->name;
 }

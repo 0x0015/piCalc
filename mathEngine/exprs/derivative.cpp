@@ -59,11 +59,29 @@ std::shared_ptr<mathEngine::expr> mathEngine::exprs::derivative::clone() const{
 }
 
 std::size_t mathEngine::exprs::derivative::hash() const{
-	std::size_t outputHash = expression->hash();
-	mathEngine::hash_combine(outputHash, wrtVar, COMPILE_TIME_CRC32_STR("derivative"));
-	return outputHash;
+	return mathEngine::hashValues(expression->hash(), wrtVar, typeID);
+}
+
+std::size_t mathEngine::exprs::derivative::hashTypeSig(bool allConstSame, std::optional<std::string_view> constWrtVar) const{
+	if(allConstSame && isConst(constWrtVar)){
+		return COMPILE_TIME_CRC32_STR("constantExpression");
+	}else{
+		return mathEngine::hashValues(typeID, expression->hashTypeSig(allConstSame, constWrtVar));
+	}
 }
 
 std::string mathEngine::exprs::derivative::getTypeString() const{
 	return "D" + wrtVar + "(" + expression->getTypeString() + ")";
+}
+
+bool mathEngine::exprs::derivative::isConst(std::optional<std::string_view> constWrtVar) const{
+	//unknowable
+	return expression->isConst(constWrtVar);
+}
+
+bool mathEngine::exprs::derivative::isEqual(const expr* other) const{
+	if(type != other->type)
+		return false;
+	const auto& otherDer = other->getAs<const derivative>();
+	return wrtVar == otherDer->wrtVar && expression->isEqual(otherDer->expression.get());
 }

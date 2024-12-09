@@ -49,11 +49,31 @@ std::shared_ptr<mathEngine::expr> mathEngine::exprs::integral::clone() const{
 }
 
 std::size_t mathEngine::exprs::integral::hash() const{
-	std::size_t outputHash = expression->hash();
-	mathEngine::hash_combine(outputHash, wrtVar, COMPILE_TIME_CRC32_STR("integral"));
-	return outputHash;
+	return mathEngine::hashValues(expression->hash(), wrtVar, typeID);
+}
+
+std::size_t mathEngine::exprs::integral::hashTypeSig(bool allConstSame, std::optional<std::string_view> constWrtVar) const{
+	if(allConstSame && isConst(constWrtVar)){
+		return COMPILE_TIME_CRC32_STR("constantExpression");
+	}else{
+		return mathEngine::hashValues(typeID, expression->hashTypeSig(allConstSame, constWrtVar));
+	}
 }
 
 std::string mathEngine::exprs::integral::getTypeString() const{
 	return "int(" + expression->getTypeString() + ") d" + wrtVar;
+}
+
+bool mathEngine::exprs::integral::isConst(std::optional<std::string_view> constWrtVar) const{
+	//unknowable
+	if(constWrtVar)
+		return expression->isConst(constWrtVar) && wrtVar != *constWrtVar;
+	return false;
+}
+
+bool mathEngine::exprs::integral::isEqual(const expr* other) const{
+	if(type != other->type)
+		return false;
+	const auto& otherInt = other->getAs<const integral>();
+	return wrtVar == otherInt->wrtVar && expression->isEqual(otherInt->expression.get());
 }

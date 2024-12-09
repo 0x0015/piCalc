@@ -1,6 +1,5 @@
 #include "mergeCommutativeOperators.hpp"
 #include "../expr.hpp"
-#include "../exprs/constant.hpp"
 #include "../exprs/add.hpp"
 #include "../exprs/multiply.hpp"
 

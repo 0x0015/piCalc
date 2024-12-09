@@ -40,11 +40,25 @@ std::shared_ptr<mathEngine::expr> mathEngine::exprs::constant::clone() const{
 }
 
 std::size_t mathEngine::exprs::constant::hash() const{
-	std::size_t outputHash = value.hash();
-	mathEngine::hash_combine(outputHash, COMPILE_TIME_CRC32_STR("constant"));
-	return outputHash;
+	return mathEngine::hashValues(value.hash(), typeID);
+}
+
+std::size_t mathEngine::exprs::constant::hashTypeSig(bool allConstSame, std::optional<std::string_view> constWrtVar) const{
+	if(allConstSame){
+		return COMPILE_TIME_CRC32_STR("constantExpression");
+	}else{
+		return typeID;
+	}
 }
 
 std::string mathEngine::exprs::constant::getTypeString() const{
 	return "constant";
+}
+
+bool mathEngine::exprs::constant::isConst(std::optional<std::string_view> wrtVar) const{
+	return true;
+}
+
+bool mathEngine::exprs::constant::isEqual(const expr* other) const{
+	return type == other->type && value.value == other->getAs<const constant>()->value.value;
 }

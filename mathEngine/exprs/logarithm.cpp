@@ -68,12 +68,28 @@ std::shared_ptr<mathEngine::expr> mathEngine::exprs::logarithm::clone() const{
 }
 
 std::size_t mathEngine::exprs::logarithm::hash() const{
-	std::size_t lhsHash = base->hash();
-	mathEngine::hash_combine(lhsHash, inside->hash(), COMPILE_TIME_CRC32_STR("logarithm"));
-	return lhsHash;
+	return mathEngine::hashValues(base->hash(), inside->hash(), typeID);
+}
+
+std::size_t mathEngine::exprs::logarithm::hashTypeSig(bool allConstSame, std::optional<std::string_view> constWrtVar) const{
+	if(allConstSame && isConst(constWrtVar)){
+		return COMPILE_TIME_CRC32_STR("constantExpression");
+	}else{
+		return mathEngine::hashValues(typeID, base->hashTypeSig(allConstSame, constWrtVar), inside->hashTypeSig(allConstSame, constWrtVar));
+	}
 }
 
 std::string mathEngine::exprs::logarithm::getTypeString() const{
 	return "log base(" + base->getTypeString() + ")(" + inside->getTypeString() + ")";
 }
 
+bool mathEngine::exprs::logarithm::isConst(std::optional<std::string_view> wrtVar) const{
+	return base->isConst(wrtVar) && inside->isConst(wrtVar);
+}
+
+bool mathEngine::exprs::logarithm::isEqual(const expr* other) const{
+	if(type != other->type)
+		return false;
+	const auto& otherLog = other->getAs<const logarithm>();
+	return base->isEqual(otherLog->base.get()) && inside->isEqual(otherLog->inside.get());
+}

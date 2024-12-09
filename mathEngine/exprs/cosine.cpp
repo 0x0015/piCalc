@@ -47,11 +47,25 @@ std::shared_ptr<mathEngine::expr> mathEngine::exprs::cosine::clone() const{
 }
 
 std::size_t mathEngine::exprs::cosine::hash() const{
-	std::size_t insHash = inside->hash();
-	mathEngine::hash_combine(insHash, COMPILE_TIME_CRC32_STR("cosine"));
-	return insHash;
+	return mathEngine::hashValues(inside->hash(), typeID);
+}
+
+std::size_t mathEngine::exprs::cosine::hashTypeSig(bool allConstSame, std::optional<std::string_view> constWrtVar) const{
+	if(allConstSame && isConst(constWrtVar)){
+		return COMPILE_TIME_CRC32_STR("constantExpression");
+	}else{
+		return mathEngine::hashValues(typeID, inside->hashTypeSig(allConstSame, constWrtVar));
+	}
 }
 
 std::string mathEngine::exprs::cosine::getTypeString() const{
 	return "cos(" + inside->getTypeString() + ")";
+}
+
+bool mathEngine::exprs::cosine::isConst(std::optional<std::string_view> wrtVar) const{
+	return inside->isConst(wrtVar);
+}
+
+bool mathEngine::exprs::cosine::isEqual(const expr* other) const{
+	return type == other->type && inside->isEqual(other->getAs<const cosine>()->inside.get());
 }

@@ -11,3 +11,4 @@ std::shared_ptr<mathEngine::expr> mathEngine::expr::substiteVariable(const std::
 		return std::nullopt;
 	});
 }
+

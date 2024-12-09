@@ -7,7 +7,13 @@
 #include <filesystem>
 #include "../simplify.hpp"
 
-std::unordered_map<std::size_t, std::pair<std::shared_ptr<mathEngine::expr>, std::shared_ptr<mathEngine::expr>>> simplificationDB;
+struct simplificationDBEntry{
+	std::size_t fromHash;
+	std::shared_ptr<mathEngine::expr> from;
+	std::shared_ptr<mathEngine::expr> to;
+};
+
+std::unordered_map<std::size_t, simplificationDBEntry> simplificationDB;
 
 //todo: add some sort of arbitrary variable and constant
 //eg. int_x cos(x) = sin(x) <=> int_y cos(y) = sin(y) so make the actual variable name not matter
@@ -43,15 +49,18 @@ void mathEngine::simplification::loadSimplificationDatabase(const std::string_vi
 		fromExpr = fullySimplify(fromExpr);
 		auto toExpr = std::get<std::shared_ptr<mathEngine::expr>>(toEq->value);
 		toExpr = fullySimplify(toExpr);
-		simplificationDB[fromExpr->hash()] = {fromExpr, toExpr};
+		simplificationDB[fromExpr->hashTypeSig(true)] = {fromExpr->hash(), fromExpr, toExpr};
 	}
 }
 
+//now change the logic below to actually make inferences about variable names and constant values
 std::shared_ptr<mathEngine::expr> mathEngine::simplification::simplifyByDatabase(std::shared_ptr<expr> exp){
 	auto retVal = exp->propegateDFS_replace([](std::shared_ptr<expr> exp)->std::optional<std::shared_ptr<expr>>{
-		auto expHash = exp->hash();
-		if(simplificationDB.contains(expHash)){
-			return simplificationDB[expHash].second->clone();
+		auto expTypeHash = exp->hashTypeSig(true);
+		if(simplificationDB.contains(expTypeHash)){
+			const auto& dbEntry = simplificationDB[expTypeHash];
+			if(dbEntry.fromHash == exp->hash() && dbEntry.from->isEqual(exp.get()))
+				return dbEntry.to;
 		}
 		return std::nullopt;
 	});

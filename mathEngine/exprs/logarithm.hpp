@@ -16,6 +16,9 @@ namespace mathEngine{
 				std::string toLatex() const override;
 				std::shared_ptr<expr> clone() const override;
 				std::size_t hash() const override;
+				std::size_t hashTypeSig(bool allConstSame = true, std::optional<std::string_view> constWrtVar = std::nullopt) const override;
+				bool isConst(std::optional<std::string_view> wrtVar = std::nullopt) const override;
+				bool isEqual(const expr* other) const override;
 				std::string getTypeString() const override;
 				std::string toCode(const std::unordered_set<std::string>& wrtVars) const override;
 				static inline std::string naturalLogCodeFuncName = "log";

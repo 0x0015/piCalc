@@ -47,12 +47,25 @@ std::shared_ptr<mathEngine::expr> mathEngine::exprs::absoluteValue::clone() cons
 }
 
 std::size_t mathEngine::exprs::absoluteValue::hash() const{
-	std::size_t lhsHash = inside->hash();
-	mathEngine::hash_combine(lhsHash, COMPILE_TIME_CRC32_STR("absoluteValue"));
-	return lhsHash;
+	return mathEngine::hashValues(inside->hash(), typeID);
+}
+
+std::size_t mathEngine::exprs::absoluteValue::hashTypeSig(bool allConstSame, std::optional<std::string_view> constWrtVar) const{
+	if(allConstSame && isConst(constWrtVar)){
+		return COMPILE_TIME_CRC32_STR("constantExpression");
+	}else{
+		return mathEngine::hashValues(typeID, inside->hashTypeSig(allConstSame, constWrtVar));
+	}
 }
 
 std::string mathEngine::exprs::absoluteValue::getTypeString() const{
 	return "abs(" + inside->getTypeString() + ")";
 }
 
+bool mathEngine::exprs::absoluteValue::isConst(std::optional<std::string_view> wrtVar) const{
+	return inside->isConst(wrtVar);
+}
+
+bool mathEngine::exprs::absoluteValue::isEqual(const expr* other) const{
+	return type == other->type && inside->isEqual(other->getAs<const absoluteValue>()->inside.get());
+}
