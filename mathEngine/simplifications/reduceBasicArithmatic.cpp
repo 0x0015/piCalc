@@ -31,7 +31,7 @@ std::shared_ptr<mathEngine::expr> mathEngine::simplification::reduceBasicArithma
 					otherTerms.push_back(term);
 			}
 			add->terms = otherTerms;
-			if(rationalSum && *rationalSum != rational{0, 1}){
+			if(rationalSum && (*rationalSum != rational{0, 1} || (otherTerms.empty() && !realSum))){
 				auto rationalTerm = std::make_shared<exprs::constant>();
 				rationalTerm->value.value = *rationalSum;
 				add->terms.push_back(rationalTerm);
@@ -70,7 +70,7 @@ std::shared_ptr<mathEngine::expr> mathEngine::simplification::reduceBasicArithma
 					otherTerms.push_back(term);
 			}
 			mul->terms = otherTerms;
-			if(rationalProduct && *rationalProduct != rational{1,1}){
+			if(rationalProduct && (*rationalProduct != rational{1,1} || (otherTerms.empty() && !realProduct))){
 				auto rationalTerm = std::make_shared<exprs::constant>();
 				rationalTerm->value.value = *rationalProduct;
 				mul->terms.push_back(rationalTerm);

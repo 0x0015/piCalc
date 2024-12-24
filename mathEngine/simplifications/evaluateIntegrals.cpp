@@ -70,6 +70,27 @@ std::optional<std::shared_ptr<mathEngine::expr>> getIntegralOf(std::shared_ptr<m
 }
 
 std::optional<std::shared_ptr<mathEngine::expr>> getIntegralOf(std::shared_ptr<mathEngine::exprs::multiply> mul, std::string_view wrtVar){
+	for(unsigned int i=0;i<mul->terms.size();i++){
+		if(mul->terms[i]->isConst(wrtVar)){
+			auto outputIns2 = std::make_shared<mathEngine::exprs::multiply>();
+			outputIns2->terms.resize(mul->terms.size()-1);
+			unsigned int termNum = 0;
+			for(unsigned int j=0;j<mul->terms.size();j++){
+				if(i == j)
+					continue;
+				outputIns2->terms[termNum] = mul->terms[j];
+				termNum++;
+			}
+
+			auto outputIns = std::make_shared<mathEngine::exprs::integral>();
+			outputIns->expression = outputIns2;
+			outputIns->wrtVar = wrtVar;
+
+			auto output = std::make_shared<mathEngine::exprs::multiply>();
+			output->terms = {mul->terms[i], outputIns};
+			return output;
+		}
+	}
 	return std::nullopt;
 }
 

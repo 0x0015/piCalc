@@ -2,6 +2,7 @@
 #include "simplifications/reduceRationals.hpp"
 #include "simplifications/mergeCommutativeOperators.hpp"
 #include "simplifications/reduceBasicArithmatic.hpp"
+#include "simplifications/reduceSimpleExponents.hpp"
 #include "simplifications/reduceSingleTermOps.hpp"
 #include "simplifications/evaluateDerivatives.hpp"
 #include "simplifications/evaluateIntegrals.hpp"
@@ -35,6 +36,7 @@ std::shared_ptr<mathEngine::expr> mathEngine::simplify(std::shared_ptr<expr> exp
 		      | applyUntilStabilization<simplification::reduceSingleTermOps>
 		      | applyUntilStabilization<simplification::mergeCommutativeOperators>
 		      | applyUntilStabilization<simplification::reduceBasicArithmatic>
+		      | applyUntilStabilization<simplification::reduceSimpleExponents>
 		      | applyUntilStabilization<simplification::reduceSingleTermOps>
 		      | applyUntilStabilization<simplification::reduceTrig>
 		      | applyUntilStabilization<simplification::evaluateDerivatives>

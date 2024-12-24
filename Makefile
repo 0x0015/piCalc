@@ -16,6 +16,7 @@ OBJS	= mathEngine/constVal.cpp.o \
 	  mathEngine/simplifications/reduceRationals.cpp.o \
 	  mathEngine/simplifications/mergeCommutativeOperators.cpp.o \
 	  mathEngine/simplifications/reduceBasicArithmatic.cpp.o \
+	  mathEngine/simplifications/reduceSimpleExponents.cpp.o \
 	  mathEngine/simplifications/reduceSingleTermOps.cpp.o \
 	  mathEngine/simplifications/evaluateDerivatives.cpp.o \
 	  mathEngine/simplifications/evaluateIntegrals.cpp.o \
